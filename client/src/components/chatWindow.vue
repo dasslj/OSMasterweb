@@ -20,7 +20,7 @@
 
           <div class="agentBubble">
             <div class="agentImg Image">
-              <img src="../assets/vite.svg" alt="" />
+              <img src="../../public/vite.svg" alt="" />
             </div>
             <div class="agentText">{{ item.answer }}</div>
           </div>
@@ -32,15 +32,14 @@
         <el-col :span="20">
           <div class="subChatInput">
             <input v-model="usersInput" placeholder="请输入您要提问的问题" class="input-with-select userInput" />
-            <el-button :icon="Search" @click="postUsersText" style="height: 40px; background-color: #212121" />
+            <el-button :icon="Search" @click="postUsersText" class="SearchBtn"/>
           </div>
         </el-col>
-        <el-col :span="2">
+        <el-col :span="4">
           <el-button class="otherBtn" :icon="Microphone" @click="postAdiuo"/>
-        </el-col>
-        <el-col :span="2">
           <el-button class="otherBtn" :icon="Picture" @click="postImage"/>
         </el-col>
+        
       </el-row>
     </el-col>
   </div>
@@ -67,14 +66,8 @@ const postUsersText = () => {
   if (historyList.value && historyList.value[0] && historyList.value[0].history) {
     let dialog = { question: "", answer: "" };
     dialog.question = usersInput.value;
-    console.log(usersInput.value);
-    // 可以获取服务端数据
-    // axios({
-    //   method:"get",
-    //   url:"http://127.0.0.1:8888/one/data"
-    // }).then(res=>{
-    //   console.log(res.data)
-    // })
+    // console.log(usersInput.value);
+    
 
     // 发送数据给服务端
     axios({
@@ -83,9 +76,26 @@ const postUsersText = () => {
       data:{
         question:usersInput.value
       }
+    })
+    // .then(res=>{
+    //   console.log(res.data)
+    // })
+    usersInput.value = ""
+
+    // 可以获取服务端数据,要先等待后端答案生成完毕
+    setTimeout(()=>{
+      axios({
+      method:"get",
+      url:"http://127.0.0.1:8888/one/data"
     }).then(res=>{
       console.log(res.data)
+      dialog.answer = res.data.answer
+      console.log("一次对话：")
+      console.dir(dialog)
     })
+    }, 1000)
+
+    
 
     // 
   //   axios.post('http://127.0.0.1:8888', { user_input: usersInput.value })
@@ -102,7 +112,7 @@ const postUsersText = () => {
   // } else {
   //   console.error("History list is not properly initialized.");
   }
-  usersInput.value = ""
+  // usersInput.value = ""
 };
 
 // 向服务端发送问题（语音）
@@ -132,7 +142,7 @@ const getServerReturn = () =>{
   outline-style: none;
   /* border: 1px solid #ccc; */
   border: none;
-  border-radius: 3px;
+  border-radius: 50px;
   padding: 10px;
   width: 93%;
   font-size: 14px;
@@ -140,11 +150,31 @@ const getServerReturn = () =>{
   font-family: "Microsoft soft";
   background-color: #212121;
   color: #f0f8ff;
+  
 }
 .subChatInput {
   border: #2f2f2f 1px solid;
   border-radius: 50px;
-  padding: 10px;
+  background-color: #212121;
+  padding: 5px;
+  
+  display: flex;
+  justify-content: space-around;
+
+}
+.SearchBtn{
+  height: 60px;
+  width: 60px;
+  background-color: #212121;
+  right: 0;
+  color: #8d8d8d;
+  border-radius: 50px;
+  
+}
+.SearchBtn:hover{
+  background-color: #2f2f2f;
+  /* border: #2f2f2f 1px solid; */
+  color: #f0f8ff;
 }
 .otherBtn {
   margin-left: 10px;
@@ -154,6 +184,7 @@ const getServerReturn = () =>{
   border-radius: 50px;
   padding: 10px;
   border: #2f2f2f 1px solid;
+  color: #8d8d8d;
 }
 .otherBtn:hover {
   background-color: #2f2f2f;
@@ -164,10 +195,15 @@ const getServerReturn = () =>{
 .chatWindow {
   width: 100%;
   height: 50em;
+  /* height: auto; */
   /* border: 1px red solid; */
   display: flex;
   flex-direction: column;
   overflow: auto; /* 隐藏超出范围的内容 */
+  
+}
+.item{
+  flex: 1;
 }
 .chatWindow::-webkit-scrollbar {
   display: none;
@@ -181,7 +217,7 @@ const getServerReturn = () =>{
 }
 .userText {
   max-width: 70%;
-  background-color: #2f2f2f;
+  /* background-color: #2f2f2f; */
   color: #f0f8ff;
   padding: 10px 10px;
   border-radius: 5px;
@@ -221,4 +257,5 @@ const getServerReturn = () =>{
   align-items: center;
   display: flex;
 }
+
 </style>

@@ -37,6 +37,10 @@ const newChat = () => {
   width: 100%;
   height: 49em;
   padding: 0 10px;
+  overflow: auto; /* 隐藏超出范围的内容 */
+}
+.chatHistory::-webkit-scrollbar {
+  display: none;
 }
 .topicTitle {
   color: #f0f8ff;
@@ -67,7 +71,7 @@ const newChat = () => {
   overflow: hidden; /* 隐藏超出范围的内容 */
   text-overflow: ellipsis; /* 使用省略号 */
   width: 90%;
-  margin: 5px auto;
+  margin: 26px auto 0 auto;
   height: 60px;
   line-height: 60px;
   padding: 0 10px;

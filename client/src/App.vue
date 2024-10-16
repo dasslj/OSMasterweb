@@ -3,41 +3,38 @@
     <el-col :span="30">
       <el-row :gutter="20" class="mainRow">
         <!-- 左侧的导航 -->
-        <el-col :span="5">
+        <el-col :span="4">
           <h3 class="routerTitle">OS 大师</h3>
           <el-menu
-            default-active="1"
+            :default-active="routerStatus"
             class="mainMenu"
             active-text-color="#ffd04b"
-            background-color="#212121"
+            background-color="none"
             text-color="#fff"
+            router="true"
+            mode="vertical"
           >
-            <el-menu-item index="1">
+            <el-menu-item index="/chat" class="mainMenuItem">
               <el-icon><ChatSquare /></el-icon>
               <span>会话</span>
             </el-menu-item>
 
-            <el-menu-item index="2">
+            <el-menu-item index="/other" class="mainMenuItem">
               <el-icon><Search /></el-icon>
               <span>查询</span>
             </el-menu-item>
-            <el-menu-item index="3">
+            <el-menu-item index="/other" class="mainMenuItem">
               <el-icon><Help /></el-icon>
               <span>介绍</span>
             </el-menu-item>
-            <el-menu-item index="4">
+            <el-menu-item index="/other" class="mainMenuItem">
               <el-icon><Setting /></el-icon>
               <span>设置</span>
             </el-menu-item>
           </el-menu>
         </el-col>
-        <!-- 中间的聊天框 -->
-        <el-col :span="15">
-          <chatWindow></chatWindow>
-        </el-col>
-        <!-- 右侧的聊天记录 -->
-        <el-col :span="4">
-          <chatHistoryWindow></chatHistoryWindow>
+        <el-col :span="19">
+          <router-view></router-view>
         </el-col>
       </el-row>
     </el-col>
@@ -52,8 +49,15 @@ import {
   Setting,
   Microphone,
 } from "@element-plus/icons-vue";
-import chatWindow from "./components/chatWindow.vue";
-import chatHistoryWindow from "./components/chatHistoryWindow.vue";
+import chatPage from "./page/chatPage.vue";
+import {ref} from "vue"
+// import router from "./router/index.js"
+// import {useRouter} from "vue-router"
+// const routerList = ["/chat","/other"]
+// const routerStatus = ref(window.location.pathname)
+const routerStatus = ref("/chat")
+// const route = useRouter()
+// console.log(window.location.pathname)
 </script>
 
 <style scoped>
@@ -68,5 +72,12 @@ import chatHistoryWindow from "./components/chatHistoryWindow.vue";
 
 .main {
   margin: 50px 30px;
+}
+.mainMenuItem{
+  border-radius: 50px;
+}
+.mainMenuItem:hover{
+  background-color: #212121;
+  border-radius: 50px;
 }
 </style>
