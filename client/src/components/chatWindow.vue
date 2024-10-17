@@ -49,7 +49,7 @@
 import axios from 'axios';
 import querystring from "querystring"
 import { Search, Microphone,Picture } from "@element-plus/icons-vue";
-import { ref } from "vue";
+import { ref,onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import useShop from "../store/index.js";
 
@@ -57,6 +57,7 @@ import useShop from "../store/index.js";
 const store = useShop();
 const { historyList } = storeToRefs(store);
 const usersInput = ref("");
+let chatWindowScroll = null;
 // console.log(historyList.value[0].history[1].question)
 // 向服务端发送问题（文本）
 const postUsersText = () => {
@@ -67,53 +68,89 @@ const postUsersText = () => {
     let dialog = { question: "", answer: "" };
     dialog.question = usersInput.value;
     // console.log(usersInput.value);
-    
+    let chatWindow = document.querySelector(".chatWindow")
 
     // 发送数据给服务端
     axios({
       method:"post",
+      // url:"http://10.8.7.12:86/chat",
       url:"http://127.0.0.1:8888/one/data",
       data:{
         question:usersInput.value
+      },
+      headers:{
+    'Content-Type': 'application/json'
       }
     })
-    // .then(res=>{
-    //   console.log(res.data)
-    // })
+    .then(res=>{
+      console.log(res.data)
+    })
+    
+
+    // 添加对话到页面中
+    
+    // 可以获取服务端数据,要先等待后端答案生成完毕
+    axios({
+      method:"get",
+      // url:"http://10.8.7.12:86/chat",
+      data:{
+        question:usersInput.value
+      },
+      url:"http://127.0.0.1:8888/one/data",
+      headers:{
+    'Content-Type': 'application/json'
+      }
+    }).then(res=>{
+      // console.log(res.data)
+      dialog.answer = res.data.answer
+      // console.log(dialog.answer)
+      // console.dir(dialog)
+      historyList.value[0].history.push(dialog)
+    })
+    chatWindowScroll = setInterval(()=>{
+      chatWindow.scrollTop = chatWindow.scrollHeight- chatWindow.clientHeight;
+      // console.dir(chatWindowScroll)
+    },100)
+    
+    // console.dir(document.querySelector(".chatWindow"))
+
     usersInput.value = ""
 
-    // 可以获取服务端数据,要先等待后端答案生成完毕
-    setTimeout(()=>{
-      axios({
-      method:"get",
-      url:"http://127.0.0.1:8888/one/data"
-    }).then(res=>{
-      console.log(res.data)
-      dialog.answer = res.data.answer
-      console.log("一次对话：")
-      console.dir(dialog)
-    })
-    }, 1000)
+    
 
     
 
     // 
-  //   axios.post('http://127.0.0.1:8888', { user_input: usersInput.value })
-  //     .then(response => {
-  //       dialog.answer = response.data.response;
-  //       // 下面是将历史对话传到数据库的代码
-  //       // historyList.value[0].history.push(dialog);
-  //       console.log(dialog)
-  //       usersInput.value = "";
-  //     })
-  //     .catch(error => {
-  //       console.error('Error sending user input:', error);
-  //     });
-  // } else {
-  //   console.error("History list is not properly initialized.");
+    // axios.get('http://10.8.7.12:86/chat', { question: usersInput.value },
+    //   {
+    //     headers:{
+    // 'Content-Type': 'application/json'
+    //   }
+    //   })
+    //   .then(response => {
+    //     dialog.answer = response.data.response;
+    //     // 下面是将历史对话传到数据库的代码
+    //     // historyList.value[0].history.push(dialog);
+    //     console.log(dialog)
+    //     usersInput.value = "";
+    //   })
+    //   .catch(error => {
+    //     console.error('Error sending user input:', error);
+    //   });
+  } else {
+    console.error("History list is not properly initialized.");
   }
   // usersInput.value = ""
 };
+
+// 停止窗口自动向下
+
+window.onwheel = function (ev) {
+    if (chatWindowScroll == null){
+      return;
+    }
+    chatWindowScroll = null
+ }
 
 // 向服务端发送问题（语音）
 const postAdiuo = () =>{
@@ -129,6 +166,11 @@ const postImage = () =>{
 const getServerReturn = () =>{
   console.log("获取服务器返回值");
 }
+
+onMounted(()=>{
+  let chatWindow = document.querySelector(".chatWindow")
+  chatWindow.scrollTop = chatWindow.scrollHeight- chatWindow.clientHeight;
+})
 
 </script>
 

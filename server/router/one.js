@@ -5,6 +5,7 @@ let question = ""
 let answer = ""
 router.get("/data", (req, res)=>{
     // console.log(req.data)
+    question = req.body.question
     res.send({
         question:question,
         answer:""+answer
@@ -25,7 +26,7 @@ router.post('/data',(req,res)=>{
     })
     // 这里要获取回答
     
-    answer = parseInt(Math.random()*100)
+    answer = "sdsadjaslkj apodasjdoasjdj asdoas;ldkldksdsadjaslkj apodasjdoasjdj asdoas;ldkldksdsadjaslkj apodasjdoasjdj asdoas;ldkldksdsadjaslkj apodasjdoasjdj asdoas;ldkldksdsadjaslkj apodasjdoasjdj asdoas;ldkldksdsadjaslkj apodasjdoasjdj asdoas;ldkldksdsadjaslkj apodasjdoasjdj asdoas;ldkldksdsadjaslkj apodasjdoasjdj asdoas;ldkldksdsadjaslkj apodasjdoasjdj asdoas;ldkldk"
 })
 
 module.exports = router;
