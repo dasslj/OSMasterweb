@@ -4,7 +4,7 @@
       <h4 class="topicTitle">历史对话</h4>
 
       <div
-        class="topic"
+        :class="[{ topic: true }, { topicActive: item.topicId == chatId }]"
         v-for="(item, index) in historyList"
         :key="index"
         @click="getHistory(item)"
@@ -17,17 +17,44 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted, onBeforeMount } from "vue";
+import axios from "axios";
 import { storeToRefs } from "pinia";
 import useShop from "../store/index.js";
 const store = useShop();
-const { historyList } = storeToRefs(store);
-const getHistory = (qustion) => {
-  console.log(qustion);
+const { chatId, historyList } = storeToRefs(store);
+
+// 历史数据列表
+// const historyList = reactive([]);
+// 获取历史数据列表
+const getHistoryList = () => {
+  axios.get("http://localhost:8888/one/data").then((res) => {
+    if (res.status === 200) {
+      // console.log(res.data.historyList);
+      for (let i = 0; i < res.data.historyList.length; ++i) {
+        historyList.value[i] = res.data.historyList[i];
+      }
+      // console.log(historyList.value);
+      // topicList.push(historyList.value[topicIndex.value].history);
+    }
+  });
+};
+const getHistory = (topic) => {
+  // console.log(topic);
+  chatId.value = topic.topicId;
+  // console.log(chatId.value);
 };
 const newChat = () => {
   console.log("new a chat");
 };
+// 页面渲染之前
+onBeforeMount(() => {
+  getHistoryList();
+  // console.log(111);
+});
+onMounted(() => {
+  getHistoryList();
+});
 </script>
 
 <style>
@@ -60,8 +87,13 @@ const newChat = () => {
   user-select: none;
   border-radius: 100px;
   cursor: pointer;
+  text-align: center;
 }
 .topic:hover {
+  color: #e7e7e7;
+  background-color: #353535;
+}
+.topicActive {
   color: #e7e7e7;
   background-color: #353535;
 }

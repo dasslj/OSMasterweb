@@ -8,23 +8,22 @@
           </div>
           <div class="agentText">请问您要问什么关于Linux的问题呢？</div>
         </div>
-        <div
-          class="bubbleList"
-          v-for="(item, index) in historyList[0].history"
-          :key="index"
-        >
-          <div class="userBubble">
-            <div class="userImg Image">
-              <img src="../assets/vue.svg" alt="" />
+        <div v-for="(item, index) in topicList[0]" :key="index">
+          <!-- {{ item }} -->
+          <div class="bubbleList">
+            <div class="userBubble">
+              <div class="userImg Image">
+                <img src="../assets/vue.svg" alt="" />
+              </div>
+              <div class="userText">{{ item.question }}</div>
             </div>
-            <div class="userText">{{ item.question }}</div>
-          </div>
 
-          <div class="agentBubble">
-            <div class="agentImg Image">
-              <img src="../../public/vite.svg" alt="" />
+            <div class="agentBubble">
+              <div class="agentImg Image">
+                <img src="../assets/vite.svg" alt="" />
+              </div>
+              <div class="agentText">{{ item.answer }}</div>
             </div>
-            <div class="agentText">{{ item.answer }}</div>
           </div>
         </div>
       </div>
@@ -37,6 +36,7 @@
               v-model="usersInput"
               placeholder="请输入您要提问的问题"
               class="input-with-select userInput"
+              @keydown.enter="postUsersText"
             />
             <el-button
               :icon="Search"
@@ -51,8 +51,7 @@
             :icon="Microphone"
             @click="startRecord"
           />
-          <el-button class="otherBtn" :icon="Picture" @click="postImage" />
-          <!-- <input type="file" id="imgInput" /> -->
+          <el-button class="otherBtn" :icon="Picture" @click="blurToBG" />
         </el-col>
       </el-row>
     </el-col>
@@ -68,28 +67,76 @@ import {
   Picture,
   GobletSquareFull,
 } from "@element-plus/icons-vue";
-import { ref, onMounted } from "vue";
+import {
+  ref,
+  onMounted,
+  onBeforeMount,
+  onBeforeUpdate,
+  reactive,
+  watch,
+  getCurrentInstance,
+} from "vue";
 import { storeToRefs } from "pinia";
 import useShop from "../store/index.js";
 import Recorder from "js-audio-recorder";
+// import router from "../router/index.js";
+// import {useRouter} from "vue-router"
 
 const store = useShop();
-const { historyList } = storeToRefs(store);
+const { isbgBlur, chatId, historyList } = storeToRefs(store);
 const usersInput = ref("");
 let chatWindowScroll = null;
-
+const instance = getCurrentInstance();
 const microphoneStatus = ref(false);
+// const historyList = reactive({
+//   content: [],
+// }); // 历史数据列表
+const topicIndex = ref(0);
+const topicList = reactive([]);
+// 获取历史数据列表
+const getHistoryList = () => {
+  axios.get("http://localhost:8888/one/data").then((res) => {
+    if (res.status === 200) {
+      // console.log(res.data.historyList);
+      for (let i = 0; i < res.data.historyList.length; ++i) {
+        historyList.value[i] = res.data.historyList[i];
+      }
+      console.log(historyList.value);
+      topicList.push(historyList.value[topicIndex.value].history);
+    }
+  });
+};
+
+// 获取当前对话的id
+const getTopicId = () => {
+  // console.log(chatId.value);
+  return chatId.value;
+};
+
+watch(
+  chatId,
+  (newData, oldData) => {
+    historyList.value.find((value, index, obj) => {
+      // console.log(value);
+      // console.log(index);
+      if (value.topicId == getTopicId()) {
+        topicIndex.value = index;
+        // instance.proxy.$forceUpdate();
+        topicList.shift();
+        topicList.push(historyList.value[topicIndex.value].history);
+      }
+    });
+  },
+  { deep: true, immediate: true }
+);
+
 // console.log(historyList.value[0].history[1].question)
 // 向服务端发送问题（文本）
 const postUsersText = () => {
   if (usersInput.value == "") {
     return;
   }
-  if (
-    historyList.value &&
-    historyList.value[0] &&
-    historyList.value[0].history
-  ) {
+  if (historyList && historyList[0] && historyList[0].history) {
     let dialog = { question: "", answer: "" };
     dialog.question = usersInput.value;
     // console.log(usersInput.value);
@@ -99,7 +146,7 @@ const postUsersText = () => {
     axios({
       method: "post",
       // url:"http://10.8.7.12:86/chat",
-      url: "http://127.0.0.1:8888/one/data",
+      url: "http://127.0.0.1:8888/one/chat",
       data: {
         question: usersInput.value,
       },
@@ -119,7 +166,7 @@ const postUsersText = () => {
       data: {
         question: usersInput.value,
       },
-      url: "http://127.0.0.1:8888/one/data",
+      url: "http://127.0.0.1:8888/one/chat",
       headers: {
         "Content-Type": "application/json",
       },
@@ -204,7 +251,7 @@ const saveAudioToLocal = (recorder) => {
   recorder.downloadWAV(new Date().getTime() + "录音");
 };
 
-// 向服务端发送问题（语音）
+// 向服务端发送问题（语音）（未完成）
 const postAdiuo = (recorder) => {
   console.log("发送语音");
   const formData = new FormData();
@@ -240,19 +287,36 @@ const postAdiuo = (recorder) => {
   });
 };
 
-// 向服务端发送问题（图片）
+// 向服务端发送问题（图片）(舍弃在本页实现)（移动至App.vue）
 const postImage = () => {
   console.log("发送图像");
+};
+
+// 背景失焦
+const blurToBG = () => {
+  isbgBlur.value = !isbgBlur.value;
+  console.log(isbgBlur.value);
 };
 
 // 接收服务器返回值
 const getServerReturn = () => {
   console.log("获取服务器返回值");
 };
-
+// 页面渲染之前
+onBeforeMount(() => {
+  getHistoryList();
+  // console.log(111);
+});
+// 页面渲染之后
 onMounted(() => {
+  // getHistoryList();
   let chatWindow = document.querySelector(".chatWindow");
   chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
+  getTopicId();
+});
+
+onBeforeUpdate(() => {
+  getHistoryList();
 });
 </script>
 
@@ -261,6 +325,10 @@ onMounted(() => {
   background-color: #2f2f2f;
   border: none;
   color: #f0f8ff;
+}
+.imgInput {
+  border: red 1px solid;
+  color: red;
 }
 .userInput {
   outline-style: none;
@@ -274,6 +342,7 @@ onMounted(() => {
   font-family: "Microsoft soft";
   background-color: #212121;
   color: #f0f8ff;
+  flex-wrap: nowrap;
 }
 .subChatInput {
   border: #2f2f2f 1px solid;
@@ -347,7 +416,7 @@ onMounted(() => {
 }
 .userText {
   max-width: 70%;
-  /* background-color: #2f2f2f; */
+  background-color: #2f2f2f;
   color: #f0f8ff;
   padding: 10px 10px;
   border-radius: 5px;
