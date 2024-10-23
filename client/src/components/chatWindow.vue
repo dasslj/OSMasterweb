@@ -1,10 +1,12 @@
 <template>
   <div>
+    <!-- <div class="chatWindowTitle"></div> -->
     <el-col>
       <div class="chatWindow">
-        <div class="agentBubble">
+        <div class="placehoderBox"></div>
+        <div class="agentBubble firstAgentBubble">
           <div class="agentImg Image">
-            <img src="../assets/vite.svg" alt="" />
+            <img src="../assets/MdiLinux.svg" alt="" />
           </div>
           <div class="agentText">请问您要问什么关于Linux的问题呢？</div>
         </div>
@@ -13,14 +15,14 @@
           <div class="bubbleList">
             <div class="userBubble">
               <div class="userImg Image">
-                <img src="../assets/vue.svg" alt="" />
+                <img src="../assets/MdiAccount.svg" alt="" />
               </div>
               <div class="userText">{{ item.question }}</div>
             </div>
 
             <div class="agentBubble">
               <div class="agentImg Image">
-                <img src="../assets/vite.svg" alt="" />
+                <img src="../assets/MdiLinux.svg" alt="" />
               </div>
               <div class="agentText">{{ item.answer }}</div>
             </div>
@@ -28,32 +30,28 @@
         </div>
       </div>
     </el-col>
-    <el-col>
-      <el-row class="chatInput">
-        <el-col :span="20">
-          <div class="subChatInput">
-            <input
-              v-model="usersInput"
-              placeholder="请输入您要提问的问题"
-              class="input-with-select userInput"
-              @keydown.enter="postUsersText"
-            />
-            <el-button
-              :icon="Search"
-              @click="postUsersText"
-              class="SearchBtn"
-            />
-          </div>
-        </el-col>
-        <el-col :span="4">
-          <el-button
-            :class="[{ otherBtn: true, recording: microphoneStatus }]"
-            :icon="Microphone"
-            @click="startRecord"
-          />
+    <el-col class="inputCol">
+      <!-- 输入框部分 -->
+      <div class="chatInput">
+
+        <div class="inputTop">
+          <el-button :class="[{ otherBtn: true, recording: microphoneStatus }]" :icon="Microphone"
+            @click="startRecord" />
           <el-button class="otherBtn" :icon="Picture" @click="blurToBG" />
-        </el-col>
-      </el-row>
+
+        </div>
+        <div class="textInput">
+          <textarea name="" id="" cols="" rows="5" placeholder="请输入您要提问的问题" v-model="usersInput"
+            @keydown.enter="postUsersText" class="userInput" style="width: 100%"></textarea>
+        </div>
+        <div class="inputBottom">
+          <el-button :icon="Search" @click="postUsersText" class="SearchBtn" />
+        </div>
+
+      </div>
+      <div class="bottomFlat">
+        版本：0.1.5
+      </div>
     </el-col>
   </div>
 </template>
@@ -182,7 +180,6 @@ const postUsersText = () => {
       // console.dir(chatWindowScroll)
     }, 100);
 
-    // console.dir(document.querySelector(".chatWindow"))
 
     usersInput.value = "";
 
@@ -312,7 +309,7 @@ onMounted(() => {
   // getHistoryList();
   let chatWindow = document.querySelector(".chatWindow");
   chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
-  getTopicId();
+
 });
 
 onBeforeUpdate(() => {
@@ -326,49 +323,85 @@ onBeforeUpdate(() => {
   border: none;
   color: #f0f8ff;
 }
-.imgInput {
-  border: red 1px solid;
-  color: red;
+
+.inputCol {
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  display: flex;
+  height: 25vh;
+  flex-direction: column;
 }
+
+.chatInput {
+  margin-top: 50px;
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  background-color: #444444;
+  border-radius: 10px;
+}
+
+.textInput {
+  /* height: 7em; */
+}
+
 .userInput {
   outline-style: none;
   /* border: 1px solid #ccc; */
   border: none;
-  border-radius: 50px;
+  /* border-radius: 50px; */
+  /* height: 100; */
   padding: 10px;
   width: 93%;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 500;
   font-family: "Microsoft soft";
-  background-color: #212121;
-  color: #f0f8ff;
+  background-color: #444444;
+  color: #C0C0C0;
   flex-wrap: nowrap;
+  resize: none;
 }
-.subChatInput {
-  border: #2f2f2f 1px solid;
-  border-radius: 50px;
-  background-color: #212121;
-  padding: 5px;
 
-  display: flex;
-  justify-content: space-around;
+.userInput::-webkit-scrollbar {
+  display: none;
 }
+
+.inputBottom {
+  padding: 5px 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+}
+
+.bottomFlat {
+  color: #f0f8ff;
+  padding: 10px 0;
+}
+
 .SearchBtn {
-  height: 60px;
+  height: 40px;
   width: 60px;
   background-color: #212121;
   right: 0;
-  color: #8d8d8d;
+  color: #C0C0C0;
   border-radius: 50px;
 }
+
 .SearchBtn:hover {
   background-color: #2f2f2f;
   /* border: #2f2f2f 1px solid; */
   color: #f0f8ff;
 }
+
+.inputTop {
+  padding: 5px 0;
+  border-bottom: 2px solid #212121;
+}
+
 .otherBtn {
   margin-left: 10px;
-  height: 60px;
+  height: 30px;
   width: 60px;
   background-color: #212121;
   border-radius: 50px;
@@ -376,47 +409,53 @@ onBeforeUpdate(() => {
   border: #2f2f2f 1px solid;
   color: #8d8d8d;
 }
+
 .otherBtn:hover {
   background-color: #2f2f2f;
   border: #2f2f2f 1px solid;
   color: #f0f8ff;
 }
+
 .recording {
   color: #c23737;
   background-color: #fff;
   border: #2f2f2f 1px solid;
 }
+
 .recording:hover {
   color: #c23737;
   background-color: #fff;
   border: #2f2f2f 1px solid;
 }
 
+.firstAgentBubble {
+  margin-top: 100px;
+}
+
 .chatWindow {
   width: 100%;
-  height: 50em;
+  height: 75vh;
+  padding: 0 20% 0 20%;
   /* height: auto; */
   /* border: 1px red solid; */
   display: flex;
   flex-direction: column;
-  overflow: auto; /* 隐藏超出范围的内容 */
+  overflow: auto;
+  /* 隐藏超出范围的内容 */
 }
+
 .item {
   flex: 1;
 }
+
 .chatWindow::-webkit-scrollbar {
-  display: none;
+  /* display: none; */
 }
 
-.chatInput {
-  margin-top: 10px;
-  width: 100%;
-  justify-items: center;
-  align-items: center;
-}
+
 .userText {
   max-width: 70%;
-  background-color: #2f2f2f;
+  /* background-color: #2f2f2f; */
   color: #f0f8ff;
   padding: 10px 10px;
   border-radius: 5px;
@@ -427,10 +466,11 @@ onBeforeUpdate(() => {
   justify-content: end;
   align-items: center;
 }
+
 .agentText {
   /* border: 1px solid greenyellow; */
   max-width: 70%;
-  /* background-color: #6b6c6d; */
+  background-color: #6b6c6d;
   color: #f0f8ff;
   padding: 10px 5px;
   border-radius: 5px;
@@ -440,20 +480,38 @@ onBeforeUpdate(() => {
 
   align-items: center;
 }
+
 .userBubble {
   display: flex;
   flex-direction: row-reverse;
   /* color: red; */
 }
+
 .agentBubble {
   display: flex;
   flex-direction: row;
 }
+
 .Image {
   width: 50px;
   height: 50px;
   justify-content: center;
   align-items: center;
   display: flex;
+  background-color: #f7f7f7;
+  border-radius: 100px;
+}
+
+.Image img {
+  width: 90%;
+
+}
+
+.agentImg img {
+  width: 70%;
+}
+
+.chatWindowTitle {
+  height: 10vh;
 }
 </style>
