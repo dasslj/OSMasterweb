@@ -28,6 +28,9 @@
             </div>
           </div>
         </div>
+        <div class="agentBubble firstAgentBubble">
+
+        </div>
       </div>
     </el-col>
     <el-col class="inputCol">
@@ -36,7 +39,7 @@
 
         <div class="inputTop">
           <el-button :class="[{ otherBtn: true, recording: microphoneStatus }]" :icon="Microphone"
-            @click="startRecord" />
+            @click="adiuoRecognition" />
           <el-button class="otherBtn" :icon="Picture" @click="blurToBG" />
 
         </div>
@@ -50,7 +53,7 @@
 
       </div>
       <div class="bottomFlat">
-        版本：0.1.5
+        版本：0.1.6
       </div>
     </el-col>
   </div>
@@ -134,75 +137,85 @@ const postUsersText = () => {
   if (usersInput.value == "") {
     return;
   }
-  if (historyList && historyList[0] && historyList[0].history) {
-    let dialog = { question: "", answer: "" };
-    dialog.question = usersInput.value;
-    // console.log(usersInput.value);
-    let chatWindow = document.querySelector(".chatWindow");
 
-    // 发送数据给服务端
-    axios({
-      method: "post",
-      // url:"http://10.8.7.12:86/chat",
-      url: "http://127.0.0.1:8888/one/chat",
-      data: {
-        question: usersInput.value,
-      },
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then((res) => {
-      console.log(res.data);
-    });
+  let dialog = { question: "", answer: "" };
+  dialog.question = usersInput.value;
+  // console.log(usersInput.value);
+  let chatWindow = document.querySelector(".chatWindow");
 
-    // 添加对话到页面中
+  // 发送数据给服务端
+  // axios({
+  //   method: "post",
+  //   // url:"http://10.8.7.12:86/chat",
+  //   url: "http://127.0.0.1:5000/chat",
+  //   data: {
+  //     user_input: usersInput.value,
+  //   },
+  //   // headers: {
+  //   //   "Content-Type": "application/json",
+  //   // },
+  // }).then((res) => {
+  //   console.log(res.data);
+  // });
 
-    // 可以获取服务端数据,要先等待后端答案生成完毕
-    axios({
-      method: "get",
-      // url:"http://10.8.7.12:86/chat",
-      data: {
-        question: usersInput.value,
-      },
-      url: "http://127.0.0.1:8888/one/chat",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then((res) => {
-      // console.log(res.data)
-      dialog.answer = res.data.answer;
-      // console.log(dialog.answer)
-      // console.dir(dialog)
+  // // 添加对话到页面中
+
+  // // 可以获取服务端数据,要先等待后端答案生成完毕
+  // axios({
+  //   method: "get",
+  //   // url:"http://10.8.7.12:86/chat",
+  //   data: {
+  //     user_input: usersInput.value,
+  //   },
+  //   url: "http://127.0.0.1:5000/chat",
+  //   // headers: {
+  //   //   "Content-Type": "application/json",
+  //   // },
+  // }).then((res) => {
+  //   // console.log(res.data)
+  //   dialog.answer = res.data.answer;
+  //   // console.log(dialog.answer)
+  //   // console.dir(dialog)
+  //   historyList.value[0].history.push(dialog);
+  // });
+  // chatWindowScroll = setInterval(() => {
+  //   chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
+  //   // console.dir(chatWindowScroll)
+  // }, 100);
+
+
+  // usersInput.value = "";
+
+  axios.post('http://localhost:5000/chat',
+    { user_input: usersInput.value })
+    .then(response => {
+      dialog.answer = response.data.response;
       historyList.value[0].history.push(dialog);
+
+    })
+    .catch(error => {
+      console.error('Error sending user input:', error);
     });
-    chatWindowScroll = setInterval(() => {
-      chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
-      // console.dir(chatWindowScroll)
-    }, 100);
+  usersInput.value = "";
 
+  // axios.post('http://127.0.0.1:5000/chat', { user_input: usersInput.value },
+  //   {
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     }
+  //   }
+  // )
+  //   .then(response => {
+  //     dialog.answer = response.data.response;
+  //     // 下面是将历史对话传到数据库的代码
+  //     // historyList.value[0].history.push(dialog);
+  //     console.log(dialog)
+  //     usersInput.value = "";
+  //   })
+  //   .catch(error => {
+  //     console.error('Error sending user input:', error);
+  //   });
 
-    usersInput.value = "";
-
-    //
-    // axios.get('http://10.8.7.12:86/chat', { question: usersInput.value },
-    //   {
-    //     headers:{
-    // 'Content-Type': 'application/json'
-    //   }
-    //   })
-    //   .then(response => {
-    //     dialog.answer = response.data.response;
-    //     // 下面是将历史对话传到数据库的代码
-    //     // historyList.value[0].history.push(dialog);
-    //     console.log(dialog)
-    //     usersInput.value = "";
-    //   })
-    //   .catch(error => {
-    //     console.error('Error sending user input:', error);
-    //   });
-  } else {
-    console.error("History list is not properly initialized.");
-  }
   // usersInput.value = ""
 };
 
@@ -284,6 +297,38 @@ const postAdiuo = (recorder) => {
   });
 };
 
+// 语音识别
+let recognition
+const adiuoRecognition = () => {
+  if (!recognition) {
+    recognition = new webkitSpeechRecognition();
+    recognition.lang = "zh-CN";
+    recognition.interimResults = true; // 设置为 false 以仅获取最终结果
+
+    recognition.onresult = (event) => {
+      const result = event.results[0][0].transcript;
+      usersInput.value += result;
+    };
+
+    recognition.onend = () => {
+      if (microphoneStatus.value) {
+        // 如果还在录音状态，重新开始识别
+        recognition.start();
+      }
+    };
+  }
+
+  if (microphoneStatus.value) {
+    // 如果当前是录音状态，则停止录音
+    recognition.stop();
+    microphoneStatus.value = false; // 更新状态
+  } else {
+    // 否则开始录音
+    microphoneStatus.value = true; // 更新状态
+    recognition.start();
+  }
+};
+
 // 向服务端发送问题（图片）(舍弃在本页实现)（移动至App.vue）
 const postImage = () => {
   console.log("发送图像");
@@ -295,10 +340,8 @@ const blurToBG = () => {
   console.log(isbgBlur.value);
 };
 
-// 接收服务器返回值
-const getServerReturn = () => {
-  console.log("获取服务器返回值");
-};
+
+
 // 页面渲染之前
 onBeforeMount(() => {
   getHistoryList();
@@ -308,7 +351,15 @@ onBeforeMount(() => {
 onMounted(() => {
   // getHistoryList();
   let chatWindow = document.querySelector(".chatWindow");
-  chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
+  setTimeout(() => {
+    chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
+  }, 1000)
+
+  watch(chatId, (newData, oldData) => {
+    setTimeout(() => {
+      chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
+    }, 100)
+  }, { deep: true, immediate: true })
 
 });
 
@@ -334,16 +385,19 @@ onBeforeUpdate(() => {
 }
 
 .chatInput {
-  margin-top: 50px;
+  /* margin-top: 50px; */
   width: 60%;
   display: flex;
   flex-direction: column;
   background-color: #444444;
   border-radius: 10px;
+  /* height: 25vh; */
+  /* justify-content: space-around; */
+  /* align-items: center; */
 }
 
 .textInput {
-  /* height: 7em; */
+  height: 60%;
 }
 
 .userInput {
@@ -361,6 +415,8 @@ onBeforeUpdate(() => {
   color: #C0C0C0;
   flex-wrap: nowrap;
   resize: none;
+
+
 }
 
 .userInput::-webkit-scrollbar {
@@ -372,6 +428,8 @@ onBeforeUpdate(() => {
   display: flex;
   flex-direction: row;
   justify-content: end;
+  height: 10%;
+
 }
 
 .bottomFlat {
@@ -395,6 +453,8 @@ onBeforeUpdate(() => {
 }
 
 .inputTop {
+  /* margin: 5px 0; */
+  height: 20%;
   padding: 5px 0;
   border-bottom: 2px solid #212121;
 }
@@ -429,19 +489,21 @@ onBeforeUpdate(() => {
 }
 
 .firstAgentBubble {
-  margin-top: 100px;
+  margin-top: 200px;
 }
 
 .chatWindow {
   width: 100%;
   height: 75vh;
   padding: 0 20% 0 20%;
+  /* align-items: center; */
   /* height: auto; */
   /* border: 1px red solid; */
   display: flex;
   flex-direction: column;
   overflow: auto;
   /* 隐藏超出范围的内容 */
+  transition: 0.5s;
 }
 
 .item {
@@ -449,8 +511,66 @@ onBeforeUpdate(() => {
 }
 
 .chatWindow::-webkit-scrollbar {
-  /* display: none; */
+  width: 7px;
+  background-color: #2b2b2b;
+  /* border-radius: 10px; */
+
+
 }
+
+/*定义滚动条轨道 内阴影+圆角*/
+.chatWindow::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  background-color: #585858;
+
+}
+
+/*定义滑块 内阴影+圆角*/
+.chatWindow::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+  background-color: #ffffff;
+
+}
+
+.chatWindow::-webkit-scrollbar-thumb:hover {
+  -webkit-box-shadow: none;
+}
+
+
+/* 滚动条箭头样式 */
+/* .chatWindow::-webkit-scrollbar-button {
+  display: block;
+  background-color: #fff;
+  display: block;
+  border: solid;
+  border-width: 0 8px 8px 8px;
+  border-color: transparent transparent #555555 transparent;
+  height: 13px;
+  width: 16px;
+} */
+
+/* .chatWindow::-webkit-scrollbar-button:single-button:vertical:decrement {
+  border-width: 0 8px 8px 8px;
+  border-color: transparent transparent #555555 transparent;
+}
+
+.chatWindow::-webkit-scrollbar-button:single-button:vertical:decrement:hover {
+  border-color: transparent transparent #777777 transparent;
+}
+
+.chatWindow::-webkit-scrollbar-button:single-button:vertical:increment {
+  border-width: 8px 8px 0 8px;
+  border-color: #555555 transparent transparent transparent;
+}
+
+.chatWindow::-webkit-scrollbar-button:vertical:single-button:increment:hover {
+  border-color: #777777 transparent transparent transparent;
+} */
+
+
+
 
 
 .userText {
@@ -484,12 +604,15 @@ onBeforeUpdate(() => {
 .userBubble {
   display: flex;
   flex-direction: row-reverse;
-  /* color: red; */
+  margin: 100px 0 50px 0;
+  transition: 0.5s;
 }
 
 .agentBubble {
   display: flex;
   flex-direction: row;
+  margin: 50px 0 100px 0;
+  transition: 0.5s;
 }
 
 .Image {
@@ -500,6 +623,7 @@ onBeforeUpdate(() => {
   display: flex;
   background-color: #f7f7f7;
   border-radius: 100px;
+
 }
 
 .Image img {
@@ -507,9 +631,19 @@ onBeforeUpdate(() => {
 
 }
 
+.agentImg {
+  margin: 0 20px 0 0;
+}
+
 .agentImg img {
   width: 70%;
+
 }
+
+.userImg {
+  margin: 0 0 0 20px;
+}
+
 
 .chatWindowTitle {
   height: 10vh;

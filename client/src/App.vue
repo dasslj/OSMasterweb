@@ -11,7 +11,7 @@
           </div>
           <el-menu :default-active="routerStatus" class="mainMenu" active-text-color="#ffd04b" background-color="none"
             text-color="#fff" router="true" mode="vertical" collapse="true">
-            <el-menu-item index="/chat" class="mainMenuItem">
+            <el-menu-item index="/chatWeb" class="mainMenuItem">
               <template #title><span>会话</span></template>
               <el-icon>
                 <ChatSquare />
@@ -153,6 +153,8 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   height: 100px;
+  margin-bottom: 40px;
+  /* border-bottom: 10px #e7e7e7 solid; */
 }
 
 .logo h1 {

@@ -17,10 +17,7 @@
 
       </div>
     </div>
-    <div class="hideButton" title="打开历史记录" @click="hideHistoryWindow" v-if="isHide.bool">
-      {{ isHide.iconOpen }} </div>
-    <div class="hideButton" title="隐藏历史记录" @click="hideHistoryWindow" v-else>
-      {{ isHide.iconHide }} </div>
+
 
   </div>
 </template>
@@ -34,8 +31,7 @@ import {
 import { storeToRefs } from "pinia";
 import useShop from "../store/index.js";
 const store = useShop();
-const isHide = reactive({ bool: false, iconOpen: ">", iconHide: "<" })
-const { chatId, historyList } = storeToRefs(store);
+const { chatId, historyList, isHide } = storeToRefs(store);
 
 // 历史数据列表
 // const historyList = reactive([]);
@@ -61,11 +57,7 @@ const getHistory = (topic) => {
 const newChat = () => {
   console.log("new a chat");
 };
-// 隐藏历史
-const hideHistoryWindow = () => {
-  isHide.bool = !isHide.bool
-  console.log("111");
-}
+
 
 // 页面渲染之前
 onBeforeMount(() => {
@@ -90,31 +82,14 @@ onMounted(() => {
 }
 
 .active {
-  transform: translate(-95%, 0);
+  transform: translate(-100%, 0);
 }
 
 .chatHistoryLeft {
   width: 100%;
 }
 
-.hideButton {
 
-  color: #fff;
-  width: 20px;
-  border-left: #424242 2px solid;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  user-select: none;
-  cursor: pointer;
-}
-
-.hideButton:hover {
-  border-left: #8b8b8b 2px solid;
-  background-color: #6b6c6d;
-  color: #111111;
-}
 
 .chatHistory {
   /* border: 1px #353535 solid; */
