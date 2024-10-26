@@ -1,37 +1,40 @@
 <template>
-  <div :class="[{ chatHistoryWindowMain: true }, { active: isHide.bool }]">
+  <div
+    :class="[
+      { chatHistoryWindowMain: true },
+      { active: isHide.bool },
+      { Disabled: isUpload },
+    ]"
+  >
     <div class="chatHistoryLeft">
       <div class="topicTitleCon">
         <h4 class="topicTitle">历史对话</h4>
       </div>
       <div class="chatHistory">
-
-
-        <div :class="[{ topic: true }, { topicActive: item.topicId == chatId }]" v-for="(item, index) in historyList"
-          :key="index" @click="getHistory(item)">
+        <div
+          :class="[{ topic: true }, { topicActive: item.topicId == chatId }]"
+          v-for="(item, index) in historyList"
+          :key="index"
+          @click="getHistory(item)"
+        >
           {{ item.topic }}
         </div>
       </div>
       <div class="newBtnCon">
         <div class="newHistoryBtu" @click="newChat">+ 新的话题</div>
-
       </div>
     </div>
-
-
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onBeforeMount } from "vue";
+import { ref, reactive, onMounted, onBeforeMount, watch, h } from "vue";
 import axios from "axios";
-import {
-  DArrowLeft, DArrowRight
-} from "@element-plus/icons-vue"
+import { DArrowLeft, DArrowRight } from "@element-plus/icons-vue";
 import { storeToRefs } from "pinia";
 import useShop from "../store/index.js";
 const store = useShop();
-const { chatId, historyList, isHide } = storeToRefs(store);
+const { chatId, historyList, isUpload, isHide } = storeToRefs(store);
 
 // 历史数据列表
 // const historyList = reactive([]);
@@ -55,9 +58,28 @@ const getHistory = (topic) => {
 };
 // 创建新的对话
 const newChat = () => {
-  console.log("new a chat");
+  const topicId = "" + Date.now();
+  let newTopic = {
+    topicId: topicId,
+    topic: "新对话",
+    history: [],
+  };
+  // 将新对话加入到对话历史列表中
+  historyList.value.push(newTopic);
+  chatId.value = topicId;
 };
 
+watch(
+  historyList,
+  (newData, oldData) => {
+    historyList.value.find((value, index, list) => {
+      if (value.topic == "新对话" && value.history.length != 0) {
+        value.topic = value.history[0].question;
+      }
+    });
+  },
+  { deep: true, immediate: true }
+);
 
 // 页面渲染之前
 onBeforeMount(() => {
@@ -84,12 +106,15 @@ onMounted(() => {
 .active {
   transform: translate(-100%, 0);
 }
+.Disabled {
+  pointer-events: none;
+  user-select: none;
+  /* filter: blur(20px); */
+}
 
 .chatHistoryLeft {
   width: 100%;
 }
-
-
 
 .chatHistory {
   /* border: 1px #353535 solid; */
@@ -113,11 +138,10 @@ onMounted(() => {
 }
 
 .topicTitle {
-  color: #C0C0C0;
+  color: #c0c0c0;
   /* text-align: center; */
   /* padding: 25px 0; */
   font-size: 25px;
-
 }
 
 .topic {
@@ -155,7 +179,6 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   /* border-top: #f0f8ff 3px solid; */
-
 }
 
 .newHistoryBtu {

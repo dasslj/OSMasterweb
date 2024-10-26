@@ -1,50 +1,58 @@
 <template>
   <div :class="{ main: true }">
-
     <div :class="{ bgBlur: isbgBlur, mainCol: true }">
       <div class="mainRow">
         <!-- 左侧的导航 -->
-        <div class="leftRouter">
-          <div class="logo">
-            <img src="./assets/MdiLinux.svg" alt="">
-            <h1>OS 大师</h1>
-          </div>
-          <el-menu :default-active="routerStatus" class="mainMenu" active-text-color="#ffd04b" background-color="none"
-            text-color="#fff" router="true" mode="vertical" collapse="true">
-            <el-menu-item index="/chatWeb" class="mainMenuItem">
-              <template #title><span>会话</span></template>
-              <el-icon>
-                <ChatSquare />
-              </el-icon>
-            </el-menu-item>
+        <div :class="[{ leftRouter: true, activate: isHide.bool }]">
+          <el-menu
+            :default-active="routerStatus"
+            class="mainMenu"
+            active-text-color="#ffd04b"
+            background-color="none"
+            text-color="#fff"
+            router="true"
+            mode="vertical"
+            collapse="true"
+          >
+            <div class="commonMenuItem">
+              <div class="logo">
+                <img src="./assets/MdiLinux.svg" alt="" />
+                <h1>OS 大师</h1>
+              </div>
+              <el-menu-item index="/chatWeb" class="mainMenuItem">
+                <template #title><span>会话</span></template>
+                <el-icon>
+                  <ChatSquare />
+                </el-icon>
+              </el-menu-item>
 
-            <el-menu-item index="/other" class="mainMenuItem">
-              <template #title><span>学习推荐</span></template>
-              <el-icon>
-                <Search />
-              </el-icon>
-
-            </el-menu-item>
-            <el-menu-item index="/other" class="mainMenuItem">
-              <template #title><span>介绍</span></template>
-              <el-icon>
-                <Help />
-              </el-icon>
-
-            </el-menu-item>
-            <el-menu-item index="/other" class="mainMenuItem">
-              <template #title><span>设置</span></template>
-              <el-icon>
-                <Setting />
-              </el-icon>
-
-            </el-menu-item>
-            <el-menu-item index="/other" class="mainMenuItem">
-              <template #title><span>我的</span></template>
-              <el-icon>
-                <User />
-              </el-icon>
-            </el-menu-item>
+              <el-menu-item index="/other" class="mainMenuItem">
+                <template #title><span>学习推荐</span></template>
+                <el-icon>
+                  <Search />
+                </el-icon>
+              </el-menu-item>
+              <el-menu-item index="/other" class="mainMenuItem">
+                <template #title><span>介绍</span></template>
+                <el-icon>
+                  <Help />
+                </el-icon>
+              </el-menu-item>
+            </div>
+            <div class="userMenuItem">
+              <el-menu-item index="/other" class="mainMenuItem">
+                <template #title><span>我的</span></template>
+                <el-icon>
+                  <User />
+                </el-icon>
+              </el-menu-item>
+              <el-menu-item index="/other" class="mainMenuItem">
+                <template #title><span>设置</span></template>
+                <el-icon>
+                  <Setting />
+                </el-icon>
+              </el-menu-item>
+            </div>
           </el-menu>
         </div>
 
@@ -56,13 +64,23 @@
     </div>
     <!-- 图片上传窗口 -->
     <div :class="[{ subWindow: true, active: isbgBlur }]">
-      <a href="#"><el-icon @click="blurToBG">
-          <Close />
-        </el-icon></a>
+      <a href="#"
+        ><el-icon @click="blurToBG"> <Close /> </el-icon
+      ></a>
 
       <div class="uploadWindow">
-        <el-upload ref="uploadRef" class="upload-demo uploadArea" drag multiple action="http://127.0.0.1:8888/one/audio"
-          accept="image" list-type="text" limit="5" :on-success="imgSuccessUpload" :on-exceed="imgExceedUpload">
+        <el-upload
+          ref="uploadRef"
+          class="upload-demo uploadArea"
+          drag
+          multiple
+          action="http://127.0.0.1:8888/one/audio"
+          accept="image"
+          list-type="text"
+          limit="5"
+          :on-success="imgSuccessUpload"
+          :on-exceed="imgExceedUpload"
+        >
           <el-icon class="el-icon--upload"><upload-filled /></el-icon>
           <div class="el-upload__text">
             <div>将文件拖拽至此区域</div>
@@ -86,14 +104,14 @@ import {
   Microphone,
   UploadFilled,
   Close,
-  User
+  User,
 } from "@element-plus/icons-vue";
 import chatPage from "./page/chatPage.vue";
 import { onMounted, ref, onBeforeMount } from "vue";
 import { storeToRefs } from "pinia";
 import useShop from "./store/index.js";
 const store = useShop();
-const { isbgBlur } = storeToRefs(store);
+const { isbgBlur, isHide } = storeToRefs(store);
 // import router from "./router/index.js"
 // const routerList = ["/chat","/other"]
 const routerStatus = ref(window.location.pathname);
@@ -126,14 +144,11 @@ const imgExceedUpload = (response, uploadFiles) => {
 
 onBeforeMount(() => {
   if (window.location.pathname === "/") {
-    routerStatus.value = "/chat"
+    routerStatus.value = "/chatWeb";
   }
-})
+});
 
-onMounted(() => {
-
-})
-
+onMounted(() => {});
 </script>
 
 <style scoped>
@@ -141,9 +156,16 @@ onMounted(() => {
   --el-menu-horizontal-height: 100px;
 } */
 .leftRouter {
-  border-right: #C0C0C0 3px solid;
+  border-right: #c0c0c0 3px solid;
   z-index: 1000;
-  background-color: #2C2C2C;
+  background-color: #2c2c2c;
+  transition: 0.5s;
+}
+.leftRouter.activate {
+  background-color: #0e0e0e;
+}
+.leftRouter.activate .mainMenuItem:hover {
+  background-color: #2c2c2c;
 }
 
 .logo {
@@ -185,9 +207,19 @@ onMounted(() => {
   height: 100vh;
   align-items: center;
 }
-
+.mainMenu {
+  display: flex;
+  height: 100vh;
+  /* width: 100%; */
+  flex-direction: column;
+  justify-content: space-between;
+  padding-bottom: 70px;
+}
 .mainMenuItem {
   margin: 5px 0;
+}
+.userMenuItem {
+  bottom: 0;
 }
 
 .bgBlur {
@@ -250,10 +282,5 @@ onMounted(() => {
   /* background-color: #212121; */
   /* background-color: red; */
   /* border: #ffd04b 1px solid; */
-}
-
-.uploadArea {
-  /* border: #ffd04b 1px solid; */
-  /* background-color: #212121; */
 }
 </style>

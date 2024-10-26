@@ -406,7 +406,7 @@ let historyList = [
             {
                 question: "Linux系统的cd命令有什么用",
                 answer:
-                    "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
+                    "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
             },
         ],
     },
@@ -434,7 +434,7 @@ let historyList = [
     },
     {
         topicId: "3",
-        topic: "无历史测试",
+        topic: "无历史记录",
         history: [
         ],
     },

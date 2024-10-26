@@ -3,6 +3,7 @@ export default () => {
     chatId: "0",
     isbgBlur: false,
     isHide: { bool: false, iconOpen: ">", iconHide: "<" },
+    isUpload: false,
     historyList: []
   }
 } 
