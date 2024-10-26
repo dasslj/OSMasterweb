@@ -106,7 +106,7 @@
           />
         </div>
       </div>
-      <div class="bottomFlat">版本：0.1.7</div>
+      <div class="bottomFlat">{{ webVersion }}</div>
     </el-col>
   </div>
 </template>
@@ -131,14 +131,16 @@ import {
   watch,
   getCurrentInstance,
 } from "vue";
+import Recorder from "js-audio-recorder";
 import { storeToRefs } from "pinia";
 import useShop from "../store/index.js";
-import Recorder from "js-audio-recorder";
+const store = useShop();
+const { isbgBlur, chatId, isUpload, historyList, webVersion } =
+  storeToRefs(store);
+
 // import router from "../router/index.js";
 // import {useRouter} from "vue-router"
 
-const store = useShop();
-const { isbgBlur, chatId, isUpload, historyList } = storeToRefs(store);
 const usersInput = ref("");
 let chatWindowScroll = null;
 const instance = getCurrentInstance();

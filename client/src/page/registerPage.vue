@@ -1,0 +1,241 @@
+<template>
+  <div class="registerMain">
+    <div class="flowrBox">
+      <div :class="{ threeBox: true, isLoginClass: isLogin }">
+        <!-- 左侧注册也 -->
+        <el-col :span="windowSpan.register">
+          <div class="Window">
+            <div class="Window">
+              <div class="Register">
+                <h1>登录您的账户</h1>
+                <!-- <div class="thirdParty">
+            
+          </div> -->
+                <p>您可以使用用户名登录，也可以使用手机号或者邮箱登录</p>
+                <div class="inputList">
+                  <input placeholder="用户名/手机号/邮箱" />
+                  <input placeholder="密码" type="password" />
+                </div>
+                <el-button>登 录</el-button>
+              </div>
+            </div>
+          </div>
+        </el-col>
+        <!-- 中间滑动块 -->
+        <el-col :span="windowSpan.slide">
+          <div :class="{ Window: true, Silde: true, isLoginClass: isLogin }">
+            <div v-if="isLogin" class="sildeShow">
+              <div style="text-align: center">
+                <h1>OS大师</h1>
+                <h3>为你的Linux学习不再烦恼</h3>
+              </div>
+              <p>快来加入我们吧</p>
+              <el-button @click="changeMode">前 往 注 册</el-button>
+            </div>
+            <div v-else class="sildeShow">
+              <h1>OS大师</h1>
+              <h3>为你的Linux学习不再烦恼</h3>
+              <p>让我们开启学习吧</p>
+              <el-button @click="changeMode">前 往 登 录</el-button>
+            </div>
+          </div>
+        </el-col>
+        <!-- 右侧注册块 -->
+        <el-col :span="windowSpan.login">
+          <div class="Window">
+            <div class="Login">
+              <h1>创建您的账户</h1>
+              <!-- <div class="thirdParty">
+            
+          </div> -->
+              <p>您可以使用用户名登录，也可以使用手机号或者邮箱登录</p>
+              <div class="inputList">
+                <input placeholder="用户名" />
+                <input placeholder="手机号/邮箱" />
+                <input placeholder="密码" type="password" />
+                <input placeholder="确认密码" type="password" />
+              </div>
+              <el-button>注 册</el-button>
+            </div>
+          </div>
+        </el-col>
+      </div>
+    </div>
+    <div style="color: #fff">{{ webVersion }}</div>
+  </div>
+</template>
+
+<script setup>
+import { reactive, ref } from "vue";
+import { storeToRefs } from "pinia";
+import useShop from "../store/index.js";
+const store = useShop();
+const { webVersion } = storeToRefs(store);
+
+// 0 9 16
+const windowSpan = reactive({
+  register: 15,
+  slide: 10,
+  login: 15,
+});
+const isLogin = ref(true);
+const changeMode = () => {
+  isLogin.value = !isLogin.value;
+};
+</script>
+
+<style scoped>
+h1 {
+  color: #fff;
+}
+.registerMain {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
+  height: 100vh;
+  width: 100%;
+}
+
+.flowrBox {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+
+  width: 1000px;
+  height: 600px;
+  min-width: 1000px;
+  min-height: 600px;
+  /* border: 1px red solid; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 30px;
+  transform: translate(-50%, -50%);
+  transition: 0.5s;
+  box-shadow: 0 5px 30px rgba(0, 0, 0.3);
+  flex-direction: row;
+  padding: 5px;
+  background-color: #4b4b4b;
+  border-radius: 20px;
+  overflow: hidden;
+  transition: 0.5s;
+}
+.threeBox {
+  display: flex;
+  flex-direction: row;
+  width: 1600px;
+  height: 600px;
+  justify-content: center;
+  transition: 0.5s;
+  transform: translateX(-30%);
+}
+.threeBox.isLoginClass {
+  transform: translateX(30%);
+}
+
+.flowrBox .el-col {
+  transition: 0.5s;
+}
+.Window {
+  width: 100%;
+  height: 600px;
+  /* border-radius: 30px; */
+  /* border: 5px blue solid; */
+  z-index: 1;
+}
+.Register {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 600px;
+  color: #ffffff;
+}
+.Register p {
+  color: #969696;
+  margin: 10px 0;
+}
+.Silde {
+  color: #fff;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #181818;
+  box-shadow: 0px 5px 30px rgba(0, 0, 0.3);
+  z-index: 2;
+  height: 600px;
+  background-image: url("../assets/MdiLinux.svg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 70px 0;
+
+  transition: 0.5s;
+}
+.Silde.isLoginClass {
+  box-shadow: 0px 5px -30px rgba(0, 0, 0.3);
+  background-position: -240px 90px;
+}
+.sildeShow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+}
+.sildeShow p {
+  color: #969696;
+  margin: 80px 0 20px;
+}
+
+.Login {
+  /* background-color: #636363; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 600px;
+  color: #ffffff;
+}
+.Login p {
+  color: #969696;
+  margin: 10px 0;
+}
+.inputList {
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+  margin: 0 0 50px 0;
+}
+.inputList input {
+  outline-style: none;
+  border: none;
+
+  padding: 15px 30px;
+  width: 100%;
+  font-size: 18px;
+  font-weight: 500;
+  font-family: "Microsoft soft";
+  background-color: #4b4b4b;
+  color: #ffffff;
+  flex-wrap: nowrap;
+  resize: none;
+  margin: 6px 0;
+  border-radius: 10px;
+
+  box-shadow: inset 3px 3px 10px #242424, inset -3px -3px 5px #9b9b9b;
+}
+.el-button {
+  border-radius: 100px;
+  height: 40px;
+  width: 200px;
+  box-shadow: 3px 3px 10px #333333;
+}
+.el-button:hover {
+  background-color: #333333;
+  border: none;
+  color: #fff;
+}
+</style>
