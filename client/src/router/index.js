@@ -5,8 +5,8 @@ import registerPage from "../page/registerPage.vue"
 import chatWebRouterPage from "../page/chatWebRouterPage.vue"
 const routes = [
     {
-        path: "/chatWeb", name: "提问页", component: chatWebRouterPage, children: [
-            { path: "/chatWeb", redirect: "/chatWeb/chat" },
+        path: "/chatWeb:uid&:uname", name: "提问页", props: true, component: chatWebRouterPage, children: [
+            { path: "/chatWeb", redirect: "/chatWeb:uid&:uname/chat" },
             { path: "chat", name: "对话页", component: chatPage },
             { path: "other", name: "其他内容页", component: otherPage },
         ]

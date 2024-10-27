@@ -33,24 +33,56 @@ import axios from "axios";
 import { DArrowLeft, DArrowRight } from "@element-plus/icons-vue";
 import { storeToRefs } from "pinia";
 import useShop from "../store/index.js";
+
+// 关于路由
+import { useRoute, onBeforeRouteUpdate } from "vue-router";
+import router from "../router/index.js";
+
+// 第一次的时候执行这个函数获取路由参数
+const route = useRoute();
+
 const store = useShop();
 const { chatId, historyList, isUpload, isHide } = storeToRefs(store);
 
 // 历史数据列表
 // const historyList = reactive([]);
 // 获取历史数据列表
-const getHistoryList = () => {
-  axios.get("http://localhost:8888/one/data").then((res) => {
-    if (res.status === 200) {
-      // console.log(res.data.historyList);
-      for (let i = 0; i < res.data.historyList.length; ++i) {
-        historyList.value[i] = res.data.historyList[i];
+
+const getHistoryList = (uid) => {
+  axios
+    .post("http://localhost:8888/one/data", {
+      uid,
+      postCode: "gdcp",
+    })
+    .then((res) => {
+      if (res.status === 200) {
+        // console.log(res.data.historyList);
+        // 获取历史列表
+        for (let i = 0; i < res.data.historyList.length; ++i) {
+          historyList.value[i] = res.data.historyList[i];
+        }
+        // console.log(historyList.value);
+        // topicList.push(historyList.value[topicIndex.value].history);
       }
-      // console.log(historyList.value);
-      // topicList.push(historyList.value[topicIndex.value].history);
-    }
-  });
+    });
 };
+
+// 这是为了防止别人直接输账号可以进入
+const keepRegister = () => {
+  let routeParams = route.params;
+  try {
+    let registerSucceedUid = localStorage.getItem("registerSucceedUid");
+    if (routeParams.uid.split(":")[1] === registerSucceedUid) {
+      getHistoryList(routeParams.uid.split(":")[1]);
+    } else {
+      router.push("/");
+    }
+  } catch (error) {
+    router.push("/");
+    console.log(error);
+  }
+};
+
 const getHistory = (topic) => {
   // console.log(topic);
   chatId.value = topic.topicId;
@@ -83,11 +115,10 @@ watch(
 
 // 页面渲染之前
 onBeforeMount(() => {
-  getHistoryList();
-  // console.log(111);
+  keepRegister();
 });
 onMounted(() => {
-  getHistoryList();
+  keepRegister();
 });
 </script>
 

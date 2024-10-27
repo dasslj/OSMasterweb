@@ -19,20 +19,20 @@
                 <img src="../assets/MdiLinux.svg" alt="" />
                 <h1>OS 大师</h1>
               </div>
-              <el-menu-item index="/chatWeb/chat" class="mainMenuItem">
+              <el-menu-item :index="routePath.chat" class="mainMenuItem">
                 <template #title><span>会话</span></template>
                 <el-icon>
                   <ChatSquare />
                 </el-icon>
               </el-menu-item>
 
-              <el-menu-item index="/chatWeb/other" class="mainMenuItem">
+              <el-menu-item :index="routePath.other" class="mainMenuItem">
                 <template #title><span>学习推荐</span></template>
                 <el-icon>
                   <Search />
                 </el-icon>
               </el-menu-item>
-              <el-menu-item index="/chatWeb/other" class="mainMenuItem">
+              <el-menu-item :index="routePath.other" class="mainMenuItem">
                 <template #title><span>介绍</span></template>
                 <el-icon>
                   <Help />
@@ -40,13 +40,13 @@
               </el-menu-item>
             </div>
             <div class="userMenuItem">
-              <el-menu-item index="/chatWeb/other" class="mainMenuItem">
+              <el-menu-item :index="routePath.other" class="mainMenuItem">
                 <template #title><span>我的</span></template>
                 <el-icon>
                   <User />
                 </el-icon>
               </el-menu-item>
-              <el-menu-item index="/chatWeb/other" class="mainMenuItem">
+              <el-menu-item :index="routePath.other" class="mainMenuItem">
                 <template #title><span>设置</span></template>
                 <el-icon>
                   <Setting />
@@ -106,15 +106,26 @@ import {
   Close,
   User,
 } from "@element-plus/icons-vue";
-import { onMounted, ref, onBeforeMount } from "vue";
+import { onMounted, ref, onBeforeMount, reactive } from "vue";
 import { storeToRefs } from "pinia";
 import useShop from "../store/index.js";
 const store = useShop();
 const { isbgBlur, isHide } = storeToRefs(store);
-// import router from "./router/index.js"
-// const routerList = ["/chat","/other"]
+
+// 关于路由
+import { useRoute, onBeforeRouteUpdate } from "vue-router";
+import router from "../router/index.js";
+// 第一次的时候执行这个函数获取路由参数
+const route = useRoute();
 const routerStatus = ref(window.location.pathname);
-// const routerStatus = ref("/chat")
+console.log(routerStatus);
+
+let routeParams = route.params;
+
+const routePath = reactive({
+  chat: `/chatWeb${routeParams.uid}&${routeParams.uname}/chat`,
+  other: `/chatWeb${routeParams.uid}&${routeParams.uname}/other`,
+});
 
 // 上传窗口的ref
 const uploadRef = ref("");
@@ -141,11 +152,7 @@ const imgExceedUpload = (response, uploadFiles) => {
   alert("最多同时上传五张照片");
 };
 
-onBeforeMount(() => {
-  if (window.location.pathname === "/") {
-    routerStatus.value = "/chat";
-  }
-});
+onBeforeMount(() => {});
 
 onMounted(() => {});
 </script>

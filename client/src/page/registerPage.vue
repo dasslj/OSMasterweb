@@ -13,10 +13,17 @@
           </div> -->
                 <p>您可以使用用户名登录，也可以使用手机号或者邮箱登录</p>
                 <div class="inputList">
-                  <input placeholder="用户名/手机号/邮箱" />
-                  <input placeholder="密码" type="password" />
+                  <input
+                    placeholder="用户名/手机号/邮箱"
+                    v-model="registerForm.account"
+                  />
+                  <input
+                    placeholder="密码"
+                    type="password"
+                    v-model="registerForm.password"
+                  />
                 </div>
-                <el-button>登 录</el-button>
+                <el-button @click="userRegister">登 录</el-button>
               </div>
             </div>
           </div>
@@ -50,12 +57,20 @@
           </div> -->
               <p>您可以使用用户名登录，也可以使用手机号或者邮箱登录</p>
               <div class="inputList">
-                <input placeholder="用户名" />
-                <input placeholder="手机号/邮箱" />
-                <input placeholder="密码" type="password" />
-                <input placeholder="确认密码" type="password" />
+                <input placeholder="用户名" v-model="loginForm.uname" />
+                <input placeholder="手机号/邮箱" v-model="emailOrPhone" />
+                <input
+                  placeholder="密码"
+                  type="password"
+                  v-model="loginForm.password"
+                />
+                <input
+                  placeholder="确认密码"
+                  type="password"
+                  v-model="loginForm.passwordAgain"
+                />
               </div>
-              <el-button>注 册</el-button>
+              <el-button @click="userLogin">注 册</el-button>
             </div>
           </div>
         </el-col>
@@ -66,11 +81,36 @@
 </template>
 
 <script setup>
-import { reactive, ref } from "vue";
+import axios from "axios";
+import { onMounted, reactive, ref } from "vue";
+
+// 导入pinia仓库
 import { storeToRefs } from "pinia";
 import useShop from "../store/index.js";
 const store = useShop();
-const { webVersion } = storeToRefs(store);
+const { webVersion, registerSucceedUid } = storeToRefs(store);
+
+// 导入vue-router
+import router from "../router/index.js";
+
+const REGISTER_URL = "http://127.0.0.1:8888/one/register";
+const LOGIN_URL = "http://127.0.0.1:8888/one/login";
+
+const isLogin = ref(false);
+
+const registerForm = reactive({
+  account: "",
+  password: "",
+});
+
+const emailOrPhone = ref("");
+const loginForm = reactive({
+  uname: "",
+  email: "",
+  phone: "",
+  password: "",
+  passwordAgain: "",
+});
 
 // 0 9 16
 const windowSpan = reactive({
@@ -78,16 +118,99 @@ const windowSpan = reactive({
   slide: 10,
   login: 15,
 });
-const isLogin = ref(true);
+
+// 修改当前模式（登录模式 或 注册模式）
 const changeMode = () => {
   isLogin.value = !isLogin.value;
 };
+
+// 向服务端发送用户账号密码
+const postUserInfo = () => {
+  axios
+    .post(REGISTER_URL, {
+      account: registerForm.account,
+      password: registerForm.password,
+    })
+    .then((res) => {
+      if (res.data.registerStatus) {
+        // registerSucceedUid.value = res.data.uid;
+        localStorage.clear();
+        localStorage.setItem("registerSucceedUid", res.data.uid);
+        router.push(`/chatWeb:${res.data.uid}&:${res.data.uname}/chat`);
+      }
+    })
+    .catch((error) => {
+      console.log("网络连接错误", error);
+      alert("网络连接错误");
+    });
+};
+
+// 登录绑定函数
+const userRegister = () => {
+  // 防止空输入
+  if (!(registerForm.account && registerForm.password)) {
+    alert("账号或密码不能为空");
+    return;
+  }
+  // 向服务端发送用户账号密码
+  postUserInfo();
+};
+
+// 注册绑定函数
+const userLogin = () => {
+  // 判断输入的是邮箱还是手机号
+  const emailPattern =
+    /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+  const phonePattern = /^1[3456789]\d{9}$/;
+  if (emailPattern.test(emailOrPhone.value)) {
+    loginForm.email = emailOrPhone.value;
+  } else if (phonePattern.test(emailOrPhone)) {
+    loginForm.phone = emailOrPhone.value;
+  } else {
+    alert("抱歉，您的手机号或者邮箱格式错误");
+    return;
+  }
+  if (
+    loginForm.uname &&
+    (loginForm.email || loginForm.phone) &&
+    loginForm.password === loginForm.passwordAgain
+  ) {
+    axios
+      .post(LOGIN_URL, {
+        uname: loginForm.uname,
+        email: loginForm.email,
+        phone: loginForm.phone,
+        password: loginForm.password,
+      })
+      .then((res) => {
+        if (res.status) {
+          alert("注册成功，回去登录吧");
+          loginForm.uname = "";
+          emailOrPhone.value = "";
+          loginForm.email = "";
+          loginForm.phone = "";
+          loginForm.password = "";
+          loginForm.passwordAgain = "";
+          changeMode();
+        }
+      })
+      .catch((error) => {
+        console.log("网络连接错误", error);
+        alert("网络连接错误");
+      });
+  } else {
+    alert("不能有空哦,而且两次密码要相同");
+  }
+};
+
+onMounted(() => {});
 </script>
 
 <style scoped>
 h1 {
   color: #fff;
 }
+
 .registerMain {
   display: flex;
   flex-direction: column;
@@ -236,6 +359,6 @@ h1 {
 .el-button:hover {
   background-color: #333333;
   border: none;
-  color: #fff;
+  color: #ffd04b;
 }
 </style>

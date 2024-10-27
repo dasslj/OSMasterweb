@@ -138,8 +138,11 @@ const store = useShop();
 const { isbgBlur, chatId, isUpload, historyList, webVersion } =
   storeToRefs(store);
 
-// import router from "../router/index.js";
-// import {useRouter} from "vue-router"
+import { useRoute } from "vue-router";
+import router from "../router/index.js";
+
+// 第一次的时候执行这个函数获取路由参数
+const route = useRoute();
 
 const usersInput = ref("");
 let chatWindowScroll = null;
@@ -150,7 +153,7 @@ import { useClipboard } from "@vueuse/core";
 //导入 text 复制的内容、 isSupported 浏览器是否支持复制、copy 复制函数
 const { text, isSupported, copy } = useClipboard();
 // 后端地址
-const AGENT_URL = "http://127.0.0.1:5000/chat";
+const AGENT_URL = "http://127.0.0.1:8080/chat";
 
 // const historyList = reactive({
 //   content: [],
@@ -158,17 +161,23 @@ const AGENT_URL = "http://127.0.0.1:5000/chat";
 const topicIndex = ref(0);
 const topicList = reactive([]);
 // 获取历史数据列表
-const getHistoryList = () => {
-  axios.get("http://localhost:8888/one/data").then((res) => {
-    if (res.status === 200) {
-      // console.log(res.data.historyList);
-      for (let i = 0; i < res.data.historyList.length; ++i) {
-        historyList.value[i] = res.data.historyList[i];
+const getHistoryList = (uid) => {
+  axios
+    .post("http://localhost:8888/one/data", {
+      uid,
+      postCode: "gdcp",
+    })
+    .then((res) => {
+      if (res.status === 200) {
+        // console.log(res.data.historyList);
+        // 获取历史列表
+        for (let i = 0; i < res.data.historyList.length; ++i) {
+          historyList.value[i] = res.data.historyList[i];
+        }
+        console.log(historyList.value);
+        topicList.push(historyList.value[topicIndex.value].history);
       }
-      console.log(historyList.value);
-      topicList.push(historyList.value[topicIndex.value].history);
-    }
-  });
+    });
 };
 
 // 获取当前对话的id
@@ -203,6 +212,10 @@ const postUsersText = (tempAnswerInterval) => {
 
   dialog.question = usersInput.value;
   let chatWindow = document.querySelector(".chatWindow");
+
+  chatWindowScroll = setInterval(() => {
+    chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
+  }, 100);
   axios
     .post(AGENT_URL, { user_input: usersInput.value })
     .then((response) => {
@@ -226,12 +239,6 @@ const postUsersText = (tempAnswerInterval) => {
   //   // headers: {
   //   //   "Content-Type": "application/json",
   //   // },
-
-  if (chatWindowScroll == null) {
-    chatWindowScroll = setInterval(() => {
-      chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
-    }, 100);
-  }
 };
 
 // 重新生成答案
@@ -379,14 +386,30 @@ const blurToBG = () => {
   console.log(isbgBlur.value);
 };
 
+// 这是为了防止别人直接输账号可以进入
+const keepRegister = () => {
+  let routeParams = route.params;
+  try {
+    let registerSucceedUid = localStorage.getItem("registerSucceedUid");
+    if (routeParams.uid.split(":")[1] === registerSucceedUid) {
+      getHistoryList(routeParams.uid.split(":")[1]);
+    } else {
+      router.push("/");
+    }
+  } catch (error) {
+    router.push("/");
+    console.log(error);
+  }
+};
+
 // 页面渲染之前的回调函数
 onBeforeMount(() => {
-  getHistoryList();
+  keepRegister();
+
   // console.log(111);
 });
 // 页面渲染之后的回调函数
 onMounted(() => {
-  // getHistoryList();
   let chatWindow = document.querySelector(".chatWindow");
   setTimeout(() => {
     chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
@@ -423,7 +446,7 @@ onMounted(() => {
 });
 
 onBeforeUpdate(() => {
-  getHistoryList();
+  keepRegister();
 });
 </script>
 
@@ -432,6 +455,9 @@ onBeforeUpdate(() => {
   background-color: #2f2f2f;
   border: none;
   color: #f0f8ff;
+}
+.el-button:hover {
+  color: #ffd04b;
 }
 .BGfuzzy {
   width: 90%;
@@ -531,7 +557,7 @@ onBeforeUpdate(() => {
 .SearchBtn:hover {
   background-color: #2f2f2f;
   /* border: #2f2f2f 1px solid; */
-  color: #f0f8ff;
+  color: #ffd04b;
 }
 
 .inputTop {
@@ -555,7 +581,7 @@ onBeforeUpdate(() => {
 .otherBtn:hover {
   background-color: #2f2f2f;
   border: #2f2f2f 1px solid;
-  color: #f0f8ff;
+  color: #ffd04b;
 }
 
 .recording {
@@ -678,7 +704,7 @@ onBeforeUpdate(() => {
   text-align: start;
   /* margin: 10px 0 50px 0; */
   display: flex;
-
+  line-height: 24px;
   /* align-items: center; */
   flex-direction: column;
 }
