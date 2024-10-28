@@ -4,16 +4,8 @@
       <div class="mainRow">
         <!-- 左侧的导航 -->
         <div :class="[{ leftRouter: true, activate: isHide.bool }]">
-          <el-menu
-            :default-active="routerStatus"
-            class="mainMenu"
-            active-text-color="#ffd04b"
-            background-color="none"
-            text-color="#fff"
-            router="true"
-            mode="vertical"
-            collapse="true"
-          >
+          <el-menu :default-active="routerStatus" class="mainMenu" active-text-color="#ffd04b" background-color="none"
+            text-color="#fff" router="true" mode="vertical" collapse="true">
             <div class="commonMenuItem">
               <div class="logo">
                 <img src="../assets/MdiLinux.svg" alt="" />
@@ -40,13 +32,13 @@
               </el-menu-item>
             </div>
             <div class="userMenuItem">
-              <el-menu-item :index="routePath.other" class="mainMenuItem">
+              <el-menu-item :index="routePath.user" class="mainMenuItem">
                 <template #title><span>我的</span></template>
                 <el-icon>
                   <User />
                 </el-icon>
               </el-menu-item>
-              <el-menu-item :index="routePath.other" class="mainMenuItem">
+              <el-menu-item :index="routePath.setting" class="mainMenuItem">
                 <template #title><span>设置</span></template>
                 <el-icon>
                   <Setting />
@@ -70,23 +62,13 @@
     </div>
     <!-- 图片上传窗口 -->
     <div :class="[{ subWindow: true, active: isbgBlur }]">
-      <a href="#"
-        ><el-icon @click="blurToBG"> <Close /> </el-icon
-      ></a>
+      <a href="#"><el-icon @click="blurToBG">
+          <Close />
+        </el-icon></a>
 
       <div class="uploadWindow">
-        <el-upload
-          ref="uploadRef"
-          class="upload-demo uploadArea"
-          drag
-          multiple
-          action="http://127.0.0.1:8888/one/audio"
-          accept="image"
-          list-type="text"
-          limit="5"
-          :on-success="imgSuccessUpload"
-          :on-exceed="imgExceedUpload"
-        >
+        <el-upload ref="uploadRef" class="upload-demo uploadArea" drag multiple action="http://127.0.0.1:8888/one/audio"
+          accept="image" list-type="text" limit="5" :on-success="imgSuccessUpload" :on-exceed="imgExceedUpload">
           <el-icon class="el-icon--upload"><upload-filled /></el-icon>
           <div class="el-upload__text">
             <div>将文件拖拽至此区域</div>
@@ -131,6 +113,8 @@ let routeParams = route.params;
 
 const routePath = reactive({
   chat: `/chatWeb${routeParams.uid}&${routeParams.uname}/chat`,
+  user: `/chatWeb${routeParams.uid}&${routeParams.uname}/user`,
+  setting: `/chatWeb${routeParams.uid}&${routeParams.uname}/setting`,
   other: `/chatWeb${routeParams.uid}&${routeParams.uname}/other`,
 });
 
@@ -161,9 +145,9 @@ const Logout = () => {
   localStorage.clear();
 };
 
-onBeforeMount(() => {});
+onBeforeMount(() => { });
 
-onMounted(() => {});
+onMounted(() => { });
 </script>
 
 <style scoped>
@@ -176,9 +160,11 @@ onMounted(() => {});
   background-color: #2c2c2c;
   transition: 0.5s;
 }
+
 .leftRouter.activate {
   background-color: #0e0e0e;
 }
+
 .leftRouter.activate .mainMenuItem:hover {
   background-color: #2c2c2c;
 }
@@ -222,6 +208,7 @@ onMounted(() => {});
   height: 100vh;
   align-items: center;
 }
+
 .mainMenu {
   display: flex;
   height: 100vh;
@@ -230,9 +217,11 @@ onMounted(() => {});
   justify-content: space-between;
   padding-bottom: 70px;
 }
+
 .mainMenuItem {
   margin: 5px 0;
 }
+
 .userMenuItem {
   bottom: 0;
 }

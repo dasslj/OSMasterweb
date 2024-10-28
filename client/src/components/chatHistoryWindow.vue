@@ -1,22 +1,16 @@
 <template>
-  <div
-    :class="[
-      { chatHistoryWindowMain: true },
-      { active: isHide.bool },
-      { Disabled: isUpload },
-    ]"
-  >
+  <div :class="[
+    { chatHistoryWindowMain: true },
+    { active: isHide.bool },
+    { Disabled: isUpload },
+  ]">
     <div class="chatHistoryLeft">
       <div class="topicTitleCon">
         <h4 class="topicTitle">历史对话</h4>
       </div>
       <div class="chatHistory">
-        <div
-          :class="[{ topic: true }, { topicActive: item.topicId == chatId }]"
-          v-for="(item, index) in historyList"
-          :key="index"
-          @click="getHistory(item)"
-        >
+        <div :class="[{ topic: true }, { topicActive: item.topicId == chatId }]" v-for="(item, index) in historyList"
+          :key="index" @click="getHistory(item)">
           {{ item.topic }}
         </div>
       </div>
@@ -137,6 +131,7 @@ onMounted(() => {
 .active {
   transform: translate(-100%, 0);
 }
+
 .Disabled {
   pointer-events: none;
   user-select: none;
@@ -189,18 +184,20 @@ onMounted(() => {
   line-height: 60px;
   padding: 0 5px;
   user-select: none;
-  border-radius: 100px;
   cursor: pointer;
+  border-radius: 100px;
+  transition: 0.5s;
   text-align: center;
 }
 
 .topic:hover {
-  color: #e7e7e7;
+  color: #ffd04b;
   background-color: #353535;
+
 }
 
 .topicActive {
-  color: #e7e7e7;
+  color: #ffd04b;
   background-color: #353535;
 }
 
@@ -233,10 +230,13 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   position: relative;
+  transition: 0.5s;
+  font-weight: 600;
+  font-size: 21px;
 }
 
 .newHistoryBtu:hover {
-  color: #e7e7e7;
+  color: #ffd04b;
   background-color: #353535;
 }
 </style>

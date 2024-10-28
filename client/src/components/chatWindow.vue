@@ -3,8 +3,10 @@
     <!-- <div class="chatWindowTitle"></div> -->
     <el-col>
       <div class="chatWindow">
+        <div class="BGfuzzyTop"
+          style="top: 0%;background: linear-gradient(180deg, rgba(44, 44, 44, 1), rgba(44, 44, 44, 0)); "></div>
         <div class="placehoderBox"></div>
-        <div class="agentBubble firstAgentBubble">
+        <div class="agentBubble" id="firstAgentBubble">
           <div class="agentImg Image">
             <img src="../assets/MdiLinux.svg" alt="" />
           </div>
@@ -33,16 +35,8 @@
                   {{ item.answer }}
                 </div>
                 <div class="agentTextBottom">
-                  <el-button
-                    :icon="CopyDocument"
-                    name="复制"
-                    @click="copy(item.answer)"
-                  ></el-button>
-                  <el-button
-                    :icon="Refresh"
-                    name="再来一次"
-                    @click="Reanswer(index, topicList[0])"
-                  ></el-button>
+                  <el-button :icon="CopyDocument" name="复制" @click="copy(item.answer)"></el-button>
+                  <el-button :icon="Refresh" name="再来一次" @click="Reanswer(index, topicList[0])"></el-button>
                 </div>
               </div>
             </div>
@@ -68,43 +62,34 @@
             </div>
           </div>
         </div>
-        <div class="agentBubble firstAgentBubble" style="margin-top: 20%"></div>
+        <div class="agentBubble" id="lastAgentBubble"></div>
       </div>
     </el-col>
 
     <el-col class="inputCol">
+      <el-buttton @click="goto('top')" v-if="isGotoTop" class="gotoBtu">
+        ↑
+      </el-buttton>
+      <el-buttton @click="goto('bottom')" v-else class="gotoBtu">
+        ↓
+      </el-buttton>
+
+
       <div class="BGfuzzyTop"></div>
       <div class="BGfuzzy"></div>
       <!-- 输入框部分 -->
       <div class="chatInput">
         <div class="inputTop">
-          <el-button
-            :class="[{ otherBtn: true, recording: microphoneStatus }]"
-            :icon="Microphone"
-            @click="adiuoRecognition"
-          />
+          <el-button :class="[{ otherBtn: true, recording: microphoneStatus }]" :icon="Microphone"
+            @click="adiuoRecognition" />
           <el-button class="otherBtn" :icon="Picture" @click="blurToBG" />
         </div>
         <div class="textInput">
-          <textarea
-            name=""
-            id=""
-            cols=""
-            rows="5"
-            placeholder="请输入您要提问的问题"
-            v-model="usersInput"
-            @keydown.enter="postUsersText"
-            class="userInput"
-            style="width: 100%"
-          ></textarea>
+          <textarea name="" id="" cols="" rows="5" placeholder="请输入您要提问的问题" v-model="usersInput"
+            @keydown.enter="postUsersText" class="userInput" style="width: 100%"></textarea>
         </div>
         <div class="inputBottom">
-          <el-button
-            :icon="Search"
-            @click="loadingNewDialog"
-            class="SearchBtn"
-            :loading="isUpload"
-          />
+          <el-button :icon="Search" @click="loadingNewDialog" class="SearchBtn" :loading="isUpload" />
         </div>
       </div>
       <div class="bottomFlat">{{ webVersion }}</div>
@@ -122,6 +107,8 @@ import {
   GobletSquareFull,
   CopyDocument,
   Refresh,
+  ArrowDownBold,
+  ArrowUpBold
 } from "@element-plus/icons-vue";
 import {
   ref,
@@ -149,6 +136,7 @@ const usersInput = ref("");
 let chatWindowScroll = null;
 const instance = getCurrentInstance();
 const microphoneStatus = ref(false);
+const isGotoTop = ref(false)
 // console.log(isUpload.value);
 import { useClipboard } from "@vueuse/core";
 //导入 text 复制的内容、 isSupported 浏览器是否支持复制、copy 复制函数
@@ -273,12 +261,35 @@ const Reanswer = (index, dialogList) => {
     });
 };
 
-// 滚动鼠标滚轮停止窗口自动向下
-window.onwheel = function (ev) {
+
+// 滚动到最上或者最下
+const goto = (where) => {
+  let chatWindow = document.querySelector(".chatWindow");
+  switch (where) {
+    case "top":
+      chatWindow.scrollTop = 0
+      break;
+    case "bottom":
+      chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
+      break;
+    default:
+      break;
+  }
+}
+
+
+// 停止窗口自动向下的计时器
+const stopChatWindowAutoDown = (chatWindowScroll) => {
   if (chatWindowScroll == null) {
     return;
   }
   clearInterval(chatWindowScroll);
+}
+
+// 滚动鼠标滚轮停止窗口自动向下
+window.onwheel = function (ev) {
+  stopChatWindowAutoDown(chatWindowScroll)
+  // console.log(ev);
 };
 
 // 开启录音
@@ -422,6 +433,7 @@ onBeforeMount(() => {
 // 页面渲染之后的回调函数
 onMounted(() => {
   let chatWindow = document.querySelector(".chatWindow");
+  let chatWindowNow = 0
   setTimeout(() => {
     chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
   }, 1000);
@@ -454,6 +466,18 @@ onMounted(() => {
     },
     { deep: true, immediate: true }
   );
+  setInterval(() => {
+    chatWindowNow = chatWindow.scrollTop
+  }, 100)
+  // 判断页面上滑还是下滑，以修改goto按钮的向下或向上
+  chatWindow.onscroll = function (ev) {
+    if (chatWindow.scrollTop >= chatWindowNow) {
+      isGotoTop.value = false
+    } else {
+      isGotoTop.value = true
+    }
+  }
+
 });
 
 onBeforeUpdate(() => {
@@ -467,9 +491,11 @@ onBeforeUpdate(() => {
   border: none;
   color: #f0f8ff;
 }
+
 .el-button:hover {
   color: #ffd04b;
 }
+
 .BGfuzzyTop {
   width: 90%;
   flex-direction: column;
@@ -481,6 +507,7 @@ onBeforeUpdate(() => {
   height: 20px;
   z-index: 3;
 }
+
 .BGfuzzy {
   width: 90%;
   flex-direction: column;
@@ -575,6 +602,7 @@ onBeforeUpdate(() => {
   right: 0;
   color: #c0c0c0;
   border-radius: 50px;
+  transition: 0.5s;
 }
 
 .SearchBtn:hover {
@@ -599,6 +627,7 @@ onBeforeUpdate(() => {
   padding: 10px;
   border: #2f2f2f 1px solid;
   color: #8d8d8d;
+  transition: 0.5s;
 }
 
 .otherBtn:hover {
@@ -619,9 +648,13 @@ onBeforeUpdate(() => {
   border: #2f2f2f 1px solid;
 }
 
-.firstAgentBubble {
+#firstAgentBubble {
   margin-top: 200px;
-  margin-bottom: 500px;
+  /* margin-bottom: 500px; */
+}
+
+#lastAgentBubble {
+  margin-top: 20%;
 }
 
 .chatWindow {
@@ -708,12 +741,15 @@ onBeforeUpdate(() => {
   justify-content: start;
   align-items: center;
 }
+
 .agentTextBottom .el-button {
   background-color: #2c2c2c;
   border-radius: 10px;
   width: 10px;
   height: 10px;
+  transition: 0.5s;
 }
+
 .agentTextContent {
   margin: 0 0 10px 0;
   background-color: #6b6c6d;
@@ -721,6 +757,7 @@ onBeforeUpdate(() => {
   padding: 10px 10px;
   border-radius: 5px;
 }
+
 .agentText {
   /* border: 1px solid greenyellow; */
   max-width: 90%;
@@ -776,5 +813,33 @@ onBeforeUpdate(() => {
 
 .chatWindowTitle {
   height: 10vh;
+}
+
+.gotoBtu {
+  height: 50px;
+  width: 50px;
+  background-color: #d1d1d1;
+  border-radius: 50px;
+  padding: 10px;
+  /* border: #2f2f2f 1px solid; */
+  color: #1d1d1d;
+  position: absolute;
+  bottom: 90%;
+  left: 50%;
+  transition: 0.5s;
+  transform: translateX(-50%);
+  z-index: 1000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  user-select: none;
+  cursor: pointer;
+}
+
+.gotoBtu:hover {
+  /* background-color: #2c2c2c; */
+  background-color: #000;
+  color: #ffd04b;
 }
 </style>

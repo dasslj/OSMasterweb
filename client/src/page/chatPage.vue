@@ -105,7 +105,7 @@ const hideHistoryWindow = () => {
 .hideBtuMain:hover {
   /* border-left: #8b8b8b 2px solid; */
   background-color: #6b6c6d;
-  color: #111111;
+  color: #ffd04b;
   font-weight: 700;
 }
 
