@@ -52,6 +52,12 @@
                   <Setting />
                 </el-icon>
               </el-menu-item>
+              <el-menu-item index="/" class="mainMenuItem" @click="Logout">
+                <template #title><span>退出登录</span></template>
+                <el-icon>
+                  <Back />
+                </el-icon>
+              </el-menu-item>
             </div>
           </el-menu>
         </div>
@@ -105,6 +111,7 @@ import {
   UploadFilled,
   Close,
   User,
+  Back,
 } from "@element-plus/icons-vue";
 import { onMounted, ref, onBeforeMount, reactive } from "vue";
 import { storeToRefs } from "pinia";
@@ -136,11 +143,8 @@ const blurToBG = () => {
   console.log(isbgBlur.value);
 };
 
-// 图片上传成功后的回调函数
+// 图片上传成功后的回调函数 (未完成还需要与后端对接)
 const imgSuccessUpload = (response, uploadFile, uploadFiles) => {
-  // console.log(response);
-  // console.log(uploadFile);
-  // console.log(uploadFiles);
   setTimeout(() => {
     uploadRef.value.clearFiles();
     isbgBlur.value = !isbgBlur.value;
@@ -150,6 +154,11 @@ const imgSuccessUpload = (response, uploadFile, uploadFiles) => {
 // 上传超过限制的回调函数
 const imgExceedUpload = (response, uploadFiles) => {
   alert("最多同时上传五张照片");
+};
+
+// 退出登录
+const Logout = () => {
+  localStorage.clear();
 };
 
 onBeforeMount(() => {});

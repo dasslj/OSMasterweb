@@ -376,12 +376,21 @@ router.get("/data", (req, res) => {
 
 router.post('/data', (req, res) => {
     if (req.body.postCode === "gdcp") {
-
+        let registerUserInfo = null
         userInfoList.find((item) => {
             if (item.uid === req.body.uid) {
-                res.send({ historyList: item.userSetting.historyList })
+                registerUserInfo = item
             }
+
         })
+        if (registerUserInfo === null) {
+            return;
+        } else {
+            // console.log("historyList:", { historyList: registerUserInfo.userSetting });
+
+            res.send({ historyList: registerUserInfo.userSetting.historyList })
+        }
+
 
 
     }
@@ -391,29 +400,36 @@ router.post('/data', (req, res) => {
 // 客户端登录端口
 router.post("/register", (req, res) => {
     const registerInfo = req.body
+    let registerUserInfo = null
     userInfoList.find((value, index, list) => {
         // console.log(value);
-        if (
-            (value.email === registerInfo.account ||
-                value.phone === registerInfo.account) &&
-            value.password === registerInfo.password
-        ) {
-            // 登录成功后
-            console.log(value.uname, "登录成功");
-            res.send({
-                uid: value.uid,
-                uname: value.uname,
-                registerStatus: true
+        if ((value.email === registerInfo.account ||
+            value.phone === registerInfo.account) &&
+            value.password === registerInfo.password) {
+            registerUserInfo = value
+        }
 
-            })
-        }
-        else {
-            // 登录失败
-            res.send({
-                registerStatus: false
-            })
-        }
     });
+    if (registerUserInfo === null) {
+        console.log("登录失败");
+        res.send({
+            registerStatus: false
+
+        })
+        return;
+    }
+
+
+    // 登录成功后
+    console.log(registerUserInfo.uname, "登录成功");
+    res.send({
+        uid: registerUserInfo.uid,
+        uname: registerUserInfo.uname,
+        registerStatus: true
+
+    })
+    return;
+
 
 
 })
@@ -421,43 +437,49 @@ router.post("/register", (req, res) => {
 // 客户端注册端口
 router.post("/login", (req, res) => {
     const loginInfo = req.body
+    let isLogined = false
     userInfoList.find((item) => {
-        if (item.email === loginInfo.email || item.phone === loginInfo.phone) {
-            res.send({
-                msg: "注册失败，因为有相同的邮箱或手机号被注册",
-                loginStatus: false
-            })
-        } else {
-            res.send({
-                msg: "注册成功"
-            })
-            // 可以加一个验证码
-
-            // 将新用户信息进入数据库
-            console.log(loginInfo);
-            let newUserInfo = {
-                uid: "" + Date.now(),
-                uname: loginInfo.uname,
-                email: loginInfo.email,
-                phone: loginInfo.phone,
-                password: loginInfo.password,
-                uesrSetting: {
-                    historyList: []
-                },
-            }
-            // 将对象转换为JSON字符串
-            jsonObj.userInfoList.push(newUserInfo)
-            console.log("jsonObj", jsonObj.userInfoList);
-
-            const data = JSON.stringify(jsonObj);
-
-            // 同步写入文件
-            fs.writeFileSync('./router/data/data.json', data);
-            console.log('数据已写入文件')
-
-            readJsonData()
+        if (item.email == loginInfo.email || item.phone == loginInfo.phone) {
+            isLogined = true
         }
     })
+
+    if (isLogined) {
+        res.send({
+            msg: "注册失败，因为有相同的邮箱或手机号被注册",
+            loginStatus: !isLogined
+        })
+    } else {
+        res.send({
+            msg: "注册成功",
+            loginStatus: !isLogined
+        })
+        // 可以加一个验证码
+
+        // 将新用户信息进入数据库
+        console.log(loginInfo);
+        let newUserInfo = {
+            uid: "" + Date.now(),
+            uname: loginInfo.uname,
+            email: loginInfo.email,
+            phone: loginInfo.phone,
+            password: loginInfo.password,
+            userSetting: {
+                historyList: []
+            },
+        }
+        // 将对象转换为JSON字符串
+        jsonObj.userInfoList.push(newUserInfo)
+        console.log("jsonObj", jsonObj.userInfoList);
+
+        const data = JSON.stringify(jsonObj);
+
+        // 同步写入文件
+        fs.writeFileSync('./router/data/data.json', data);
+        console.log('数据已写入文件')
+
+        readJsonData()
+    }
 
 
 

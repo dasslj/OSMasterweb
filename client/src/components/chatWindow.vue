@@ -73,6 +73,7 @@
     </el-col>
 
     <el-col class="inputCol">
+      <div class="BGfuzzyTop"></div>
       <div class="BGfuzzy"></div>
       <!-- 输入框部分 -->
       <div class="chatInput">
@@ -171,11 +172,20 @@ const getHistoryList = (uid) => {
       if (res.status === 200) {
         // console.log(res.data.historyList);
         // 获取历史列表
-        for (let i = 0; i < res.data.historyList.length; ++i) {
-          historyList.value[i] = res.data.historyList[i];
+        if (res.data.historyList.length !== 0) {
+          for (let i = 0; i < res.data.historyList.length; ++i) {
+            historyList.value[i] = res.data.historyList[i];
+          }
+          // console.log(historyList.value);
+          topicList.push(historyList.value[topicIndex.value].history);
+        } else {
+          historyList.value[0] = {
+            topicId: "0",
+            topic: "新对话",
+            history: [],
+          };
+          topicList.push(historyList.value[topicIndex.value].history);
         }
-        console.log(historyList.value);
-        topicList.push(historyList.value[topicIndex.value].history);
       }
     });
 };
@@ -387,6 +397,7 @@ const blurToBG = () => {
 };
 
 // 这是为了防止别人直接输账号可以进入
+// 同时在用户未退出登录时可以在同一个浏览器直接登录到主页，无需再次登录
 const keepRegister = () => {
   let routeParams = route.params;
   try {
@@ -459,14 +470,26 @@ onBeforeUpdate(() => {
 .el-button:hover {
   color: #ffd04b;
 }
+.BGfuzzyTop {
+  width: 90%;
+  flex-direction: column;
+  position: absolute;
+  bottom: 100%;
+  background: linear-gradient(0deg, rgba(44, 44, 44, 1), rgba(44, 44, 44, 0));
+  pointer-events: none;
+  user-select: none;
+  height: 20px;
+  z-index: 3;
+}
 .BGfuzzy {
   width: 90%;
   flex-direction: column;
   position: absolute;
   top: 0%;
-  background-color: rgba(44, 44, 44, 0.9);
+  background-color: #2c2c2c;
+  /* background-color: rgba(44, 44, 44, 0.9); */
   /* background: linear-gradient(0deg, rgba(44, 44, 44, 1), rgba(44, 44, 44, 0.9)); */
-  backdrop-filter: saturate(50%) blur(10px);
+  /* backdrop-filter: saturate(50%) blur(10px); */
   /* background-image: radial-gradient(
     transparent 1px,
     rgba(44, 44, 44, 0.9),

@@ -11,10 +11,10 @@
                 <!-- <div class="thirdParty">
             
           </div> -->
-                <p>您可以使用用户名登录，也可以使用手机号或者邮箱登录</p>
+                <p>请使用手机号或者邮箱登录</p>
                 <div class="inputList">
                   <input
-                    placeholder="用户名/手机号/邮箱"
+                    placeholder="手机号/邮箱"
                     v-model="registerForm.account"
                   />
                   <input
@@ -55,7 +55,7 @@
               <!-- <div class="thirdParty">
             
           </div> -->
-              <p>您可以使用用户名登录，也可以使用手机号或者邮箱登录</p>
+              <p>请使用手机号或者邮箱登录</p>
               <div class="inputList">
                 <input placeholder="用户名" v-model="loginForm.uname" />
                 <input placeholder="手机号/邮箱" v-model="emailOrPhone" />
@@ -96,7 +96,7 @@ import router from "../router/index.js";
 const REGISTER_URL = "http://127.0.0.1:8888/one/register";
 const LOGIN_URL = "http://127.0.0.1:8888/one/login";
 
-const isLogin = ref(false);
+const isLogin = ref(true);
 
 const registerForm = reactive({
   account: "",
@@ -156,19 +156,35 @@ const userRegister = () => {
   postUserInfo();
 };
 
-// 注册绑定函数
-const userLogin = () => {
-  // 判断输入的是邮箱还是手机号
+// 判断输入的是邮箱还是手机号
+const isEmailOrPhone = (isFormatCorrect) => {
   const emailPattern =
     /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
-  const phonePattern = /^1[3456789]\d{9}$/;
+  const phonePattern = /^1[3-9]\d{9}$/;
   if (emailPattern.test(emailOrPhone.value)) {
     loginForm.email = emailOrPhone.value;
-  } else if (phonePattern.test(emailOrPhone)) {
+    isFormatCorrect = true;
+    console.log(loginForm.phone, loginForm.email, 111);
+    return isFormatCorrect;
+  }
+  console.log(phonePattern.test(emailOrPhone.value), emailOrPhone.value);
+
+  if (phonePattern.test(emailOrPhone.value)) {
     loginForm.phone = emailOrPhone.value;
-  } else {
-    alert("抱歉，您的手机号或者邮箱格式错误");
-    return;
+    isFormatCorrect = true;
+    console.log(loginForm.phone, loginForm.email, 111);
+    return isFormatCorrect;
+  }
+  console.log(loginForm.phone, loginForm.email, 111);
+  return isFormatCorrect;
+};
+
+// 注册绑定函数
+const userLogin = () => {
+  let isFormatCorrect = false;
+  isEmailOrPhone(isFormatCorrect);
+  if (isFormatCorrect) {
+    alert("手机号或邮箱格式错误，请重试");
   }
   if (
     loginForm.uname &&
@@ -184,14 +200,18 @@ const userLogin = () => {
       })
       .then((res) => {
         if (res.status) {
-          alert("注册成功，回去登录吧");
-          loginForm.uname = "";
-          emailOrPhone.value = "";
-          loginForm.email = "";
-          loginForm.phone = "";
-          loginForm.password = "";
-          loginForm.passwordAgain = "";
-          changeMode();
+          if (res.data.loginStatus) {
+            alert("注册成功，回去登录吧");
+            loginForm.uname = "";
+            emailOrPhone.value = "";
+            loginForm.email = "";
+            loginForm.phone = "";
+            loginForm.password = "";
+            loginForm.passwordAgain = "";
+            changeMode();
+          } else {
+            alert("邮箱或手机号已被注册");
+          }
         }
       })
       .catch((error) => {
