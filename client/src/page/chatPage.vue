@@ -6,8 +6,12 @@
         <chatHistoryWindow></chatHistoryWindow>
         <div :class="[{ hideBtuMain: true, active: isHide.bool }]" @click="hideHistoryWindow">
           <div class="hideButton" title="打开历史记录">
-            <div v-if="isHide.bool">{{ isHide.iconOpen }} </div>
-            <div v-else>{{ isHide.iconHide }} </div>
+            <div v-if="isHide.bool">
+              <ArrowRightBold />
+            </div>
+            <div v-else>
+              <ArrowLeftBold />
+            </div>
           </div>
         </div>
       </el-col>
@@ -33,6 +37,8 @@ import {
   Help,
   Setting,
   Microphone,
+  ArrowRightBold,
+  ArrowLeftBold
 } from "@element-plus/icons-vue";
 import chatWindow from "../components/chatWindow.vue";
 import chatHistoryWindow from "../components/chatHistoryWindow.vue";
@@ -83,6 +89,16 @@ const hideHistoryWindow = () => {
   flex-direction: row;
 }
 
+/* .ArrowRightBold {
+  width: 10px;
+  height: 10px;
+}
+
+.ArrowLeftBold {
+  width: 10px;
+  height: 10px;
+} */
+
 .hideBtuMain {
   position: absolute;
   top: 50%;
@@ -119,6 +135,11 @@ const hideHistoryWindow = () => {
 }
 
 .hideButton:hover {}
+
+.hideButton div {
+  width: 10px;
+  height: 20px;
+}
 
 
 .active {

@@ -68,304 +68,21 @@ router.post("/audio", (req, res) => {
 
 })
 
-// router.get("/audio", (req, res) => {
-//     formData = req.body
-//     console.log(formData);
-
-//     res.send({
-//         formData: formData		  // 需要响应给客户端的具体数据
-//     })
-// })
-
-// 数据库模拟
-
-// let userInfoList = [
-//     {
-//         uid: "01093002",
-//         uname: "admin",
-//         email: "dasslj@163.com",
-//         phone: "13316050448",
-//         password: "123456",
-//         userSetting: {
-//             historyList: [
-//                 {
-//                     topicId: "0",
-//                     topic: "怎么证明1+1=2请详细说明",
-//                     history: [
 
 
-
-
-//                         {
-//                             question: "Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "怎么证明1+1=2请详细说明",
-//                             answer: "不告诉你",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "怎么证明1+1=2请详细说明",
-//                             answer: "不告诉你",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "怎么证明1+1=2请详细说明",
-//                             answer: "不告诉你",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "怎么证明1+1=2请详细说明",
-//                             answer: "不告诉你",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用,Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                         {
-//                             question: "Linux系统的cd命令有什么用",
-//                             answer:
-//                                 "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置.在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-//                     ],
-//                 },
-//                 {
-//                     topicId: "12",
-//                     topic: "超出选项卡测试",
-//                     history: [
-//                         {
-//                             question: "Linux的cd命令有什么用",
-//                             answer: "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-
-//                     ],
-//                 }, {
-//                     topicId: "13",
-//                     topic: "超出选项卡测试",
-//                     history: [
-//                         {
-//                             question: "Linux的cd命令有什么用",
-//                             answer: "在Linux系统中，cd（change directory）命令用于更改当前工作目录。它允许用户导航到文件系统中的其他位置",
-//                         },
-
-//                     ],
-//                 }
-//             ]
-//         }
-
-//     }
-// ]
-
+/**
+ * 模拟后端
+ * 
+ * 数据存储系统
+ * 
+ * 功能：
+ *      get
+ *          1、只是方便我调试代码时，用来看数据结构的，前端代码中没有使用到get请求
+ *      post
+ *          1、这里因为开了全端口响应，所有用了一个postCode作为是否产生响应的标识
+ *          2、这里通过请求发送的uid判断前端请求的是哪一个用户的信息，因为这里只会返回对于用户的数据，不会将所有用户的数据返回（这里的get是返回所有数据的，只是想说一下以免误解返回的数据）
+ *          
+ */
 
 router.get("/data", (req, res) => {
     res.send({
@@ -375,21 +92,62 @@ router.get("/data", (req, res) => {
 
 
 router.post('/data', (req, res) => {
-    if (req.body.postCode === "gdcp") {
+    // 登录后进入chatWeb界面需要的数据
+    if (req.body.postCode === "gdcpRegisterWebData") {
         let registerUserInfo = null
         userInfoList.find((item) => {
             if (item.uid === req.body.uid) {
                 registerUserInfo = item
             }
-
         })
         if (registerUserInfo === null) {
             return;
         } else {
-            // console.log("historyList:", { historyList: registerUserInfo.userSetting });
+            res.send({
+                uname: registerUserInfo.uname,
+                email: registerUserInfo.email,
+                phone: registerUserInfo.phone,
+                historyList: registerUserInfo.userSetting.historyList,
+                lastChat: registerUserInfo.userSetting.lastChat
 
-            res.send({ historyList: registerUserInfo.userSetting.historyList })
+            })
         }
+    } else if (req.body.postCode === "gdcpDataPost") {
+
+        // let isUserExists = false // 判断用户是否存在
+        let msg = req.body
+        console.log(msg);
+        // 将用户新信息更新到数据库
+
+        userInfoList.find((item, index) => {
+            if (msg.uid === item.uid) {
+                // isUserExists = true
+                let newData = {
+                    uid: item.uid,
+                    uname: msg.uname,
+                    email: msg.email,
+                    phone: msg.phone,
+                    password: item.password,
+                    userSetting: {
+                        lastChat: msg.lastChat,
+                        historyList: msg.historyList
+                    }
+                }
+
+                // userInfoList[index] = 
+                jsonObj.userInfoList[index] = newData
+                console.log("jsonObj", jsonObj.userInfoList);
+                // 将对象转换为JSON字符串
+                const data = JSON.stringify(jsonObj);
+
+                // 同步写入文件
+                fs.writeFileSync('./router/data/data.json', data);
+                console.log('数据已写入文件')
+
+                readJsonData()
+                res.send("更新成功")
+            }
+        })
 
 
 
@@ -397,7 +155,24 @@ router.post('/data', (req, res) => {
 
 })
 
-// 客户端登录端口
+/**
+ * 模拟后端
+ * 
+ * 登录系统
+ * 
+ * 客户端登录端口
+ * 
+ * 功能：
+ * 1、接收前端发送的post请求
+ * 2、首先判断手机号或者邮箱和密码是否同时正确
+ * 3、
+ *  （1）如果都正确则返回登录成功的标识，和有需要的用户信息
+ *  （2）如果有部分不正确或完全不正确则发送登录失败的标识
+ *       
+ * 
+ */
+
+
 router.post("/register", (req, res) => {
     const registerInfo = req.body
     let registerUserInfo = null
@@ -414,12 +189,9 @@ router.post("/register", (req, res) => {
         console.log("登录失败");
         res.send({
             registerStatus: false
-
         })
         return;
     }
-
-
     // 登录成功后
     console.log(registerUserInfo.uname, "登录成功");
     res.send({
@@ -434,7 +206,23 @@ router.post("/register", (req, res) => {
 
 })
 
-// 客户端注册端口
+/**
+ * 模拟后端
+ * 
+ * 注册系统
+ * 
+ * 客户端注册端口
+ * 
+ * 功能：
+ * 1、接收前端发送的post请求
+ * 2、首先判断手机号或者邮箱是否已经被注册
+ * 3、
+ *  （1）如果已经注册isLogined变量为true
+ *       将已被注册的信息返回给前端
+ *  （2）如果没有被注册则将用户对象newUserInfo
+ *       追加到userInfoList，并且写入到data.json中
+ * 
+ */
 router.post("/login", (req, res) => {
     const loginInfo = req.body
     let isLogined = false
@@ -465,6 +253,7 @@ router.post("/login", (req, res) => {
             phone: loginInfo.phone,
             password: loginInfo.password,
             userSetting: {
+                lastChat: "0",
                 historyList: []
             },
         }

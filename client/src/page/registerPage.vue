@@ -13,15 +13,8 @@
           </div> -->
                 <p>请使用手机号或者邮箱登录</p>
                 <div class="inputList">
-                  <input
-                    placeholder="手机号/邮箱"
-                    v-model="registerForm.account"
-                  />
-                  <input
-                    placeholder="密码"
-                    type="password"
-                    v-model="registerForm.password"
-                  />
+                  <input placeholder="手机号/邮箱" v-model="registerForm.account" />
+                  <input placeholder="密码" type="password" v-model="registerForm.password" />
                 </div>
                 <el-button @click="userRegister">登 录</el-button>
               </div>
@@ -59,16 +52,8 @@
               <div class="inputList">
                 <input placeholder="用户名" v-model="loginForm.uname" />
                 <input placeholder="手机号/邮箱" v-model="emailOrPhone" />
-                <input
-                  placeholder="密码"
-                  type="password"
-                  v-model="loginForm.password"
-                />
-                <input
-                  placeholder="确认密码"
-                  type="password"
-                  v-model="loginForm.passwordAgain"
-                />
+                <input placeholder="密码" type="password" v-model="loginForm.password" />
+                <input placeholder="确认密码" type="password" v-model="loginForm.passwordAgain" />
               </div>
               <el-button @click="userLogin">注 册</el-button>
             </div>
@@ -164,18 +149,18 @@ const isEmailOrPhone = (isFormatCorrect) => {
   if (emailPattern.test(emailOrPhone.value)) {
     loginForm.email = emailOrPhone.value;
     isFormatCorrect = true;
-    console.log(loginForm.phone, loginForm.email, 111);
+    // console.log(loginForm.phone, loginForm.email, 111);
     return isFormatCorrect;
   }
-  console.log(phonePattern.test(emailOrPhone.value), emailOrPhone.value);
+  // console.log(phonePattern.test(emailOrPhone.value), emailOrPhone.value);
 
   if (phonePattern.test(emailOrPhone.value)) {
     loginForm.phone = emailOrPhone.value;
     isFormatCorrect = true;
-    console.log(loginForm.phone, loginForm.email, 111);
+    // console.log(loginForm.phone, loginForm.email, 111);
     return isFormatCorrect;
   }
-  console.log(loginForm.phone, loginForm.email, 111);
+  // console.log(loginForm.phone, loginForm.email, 111);
   return isFormatCorrect;
 };
 
@@ -223,7 +208,7 @@ const userLogin = () => {
   }
 };
 
-onMounted(() => {});
+onMounted(() => { });
 </script>
 
 <style scoped>
@@ -264,6 +249,7 @@ h1 {
   overflow: hidden;
   transition: 0.5s;
 }
+
 .threeBox {
   display: flex;
   flex-direction: row;
@@ -273,6 +259,7 @@ h1 {
   transition: 0.5s;
   transform: translateX(-30%);
 }
+
 .threeBox.isLoginClass {
   transform: translateX(30%);
 }
@@ -280,6 +267,7 @@ h1 {
 .flowrBox .el-col {
   transition: 0.5s;
 }
+
 .Window {
   width: 100%;
   height: 600px;
@@ -287,6 +275,7 @@ h1 {
   /* border: 5px blue solid; */
   z-index: 1;
 }
+
 .Register {
   display: flex;
   flex-direction: column;
@@ -295,10 +284,12 @@ h1 {
   height: 600px;
   color: #ffffff;
 }
+
 .Register p {
   color: #969696;
   margin: 10px 0;
 }
+
 .Silde {
   color: #fff;
   width: 100%;
@@ -317,10 +308,12 @@ h1 {
 
   transition: 0.5s;
 }
+
 .Silde.isLoginClass {
   box-shadow: 0px 5px -30px rgba(0, 0, 0.3);
   background-position: -240px 90px;
 }
+
 .sildeShow {
   display: flex;
   flex-direction: column;
@@ -328,6 +321,7 @@ h1 {
   justify-content: center;
   height: 400px;
 }
+
 .sildeShow p {
   color: #969696;
   margin: 80px 0 20px;
@@ -342,16 +336,19 @@ h1 {
   height: 600px;
   color: #ffffff;
 }
+
 .Login p {
   color: #969696;
   margin: 10px 0;
 }
+
 .inputList {
   display: flex;
   flex-direction: column;
   width: 70%;
   margin: 0 0 50px 0;
 }
+
 .inputList input {
   outline-style: none;
   border: none;
@@ -370,12 +367,14 @@ h1 {
 
   box-shadow: inset 3px 3px 10px #242424, inset -3px -3px 5px #9b9b9b;
 }
+
 .el-button {
   border-radius: 100px;
   height: 40px;
   width: 200px;
   box-shadow: 3px 3px 10px #333333;
 }
+
 .el-button:hover {
   background-color: #333333;
   border: none;

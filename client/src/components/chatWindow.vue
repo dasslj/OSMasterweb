@@ -7,10 +7,11 @@
           style="top: 0%;background: linear-gradient(180deg, rgba(44, 44, 44, 1), rgba(44, 44, 44, 0)); "></div>
         <div class="placehoderBox"></div>
         <div class="agentBubble" id="firstAgentBubble">
-          <div class="agentImg Image">
-            <img src="../assets/MdiLinux.svg" alt="" />
-          </div>
+
           <div class="agentText">
+            <div class="agentImg Image">
+              <img src="../assets/MdiLinux.svg" alt="" />
+            </div>
             <div class="agentTextContent">
               请问您要问什么关于Linux的问题呢？
             </div>
@@ -20,17 +21,21 @@
           <!-- {{ item }} -->
           <div class="bubbleList">
             <div class="userBubble">
-              <div class="userImg Image">
-                <img src="../assets/MdiAccount.svg" alt="" />
+
+              <div class="userText">
+                <div class="userImg Image">
+                  <img src="../assets/MdiAccount.svg" alt="" />
+                </div>
+                {{ item.question }}
               </div>
-              <div class="userText">{{ item.question }}</div>
             </div>
 
             <div class="agentBubble">
-              <div class="agentImg Image">
-                <img src="../assets/MdiLinux.svg" alt="" />
-              </div>
+
               <div class="agentText">
+                <div class="agentImg Image">
+                  <img src="../assets/MdiLinux.svg" alt="" />
+                </div>
                 <div class="agentTextContent">
                   {{ item.answer }}
                 </div>
@@ -44,17 +49,21 @@
         </div>
         <div class="tempBubble" v-if="isUpload">
           <div class="userBubble">
-            <div class="userImg Image">
-              <img src="../assets/MdiAccount.svg" alt="" />
+
+            <div class="userText">
+              <div class="userImg Image">
+                <img src="../assets/MdiAccount.svg" alt="" />
+              </div>
+              {{ tempQuestion }}
             </div>
-            <div class="userText">{{ tempQuestion }}</div>
           </div>
 
           <div class="agentBubble">
-            <div class="agentImg Image">
-              <img src="../assets/MdiLinux.svg" alt="" />
-            </div>
+
             <div class="agentText">
+              <div class="agentImg Image">
+                <img src="../assets/MdiLinux.svg" alt="" />
+              </div>
               <div class="agentTextContent">
                 {{ tempAnswer }}
               </div>
@@ -122,12 +131,13 @@ import {
 import Recorder from "js-audio-recorder";
 import { storeToRefs } from "pinia";
 import useShop from "../store/index.js";
-const store = useShop();
-const { isbgBlur, chatId, isUpload, historyList, webVersion } =
-  storeToRefs(store);
-
 import { useRoute } from "vue-router";
 import router from "../router/index.js";
+const store = useShop();
+const { isbgBlur, chatId, isUpload, isReUpload, historyList, webVersion, uname, email, phone } =
+  storeToRefs(store);
+
+
 
 // 第一次的时候执行这个函数获取路由参数
 const route = useRoute();
@@ -142,37 +152,66 @@ import { useClipboard } from "@vueuse/core";
 //导入 text 复制的内容、 isSupported 浏览器是否支持复制、copy 复制函数
 const { text, isSupported, copy } = useClipboard();
 // 后端地址
-const AGENT_URL = "http://127.0.0.1:8080/chat";
+const AGENT_URL = "http://127.0.0.1:5000/chat";
 
-// const historyList = reactive({
-//   content: [],
-// }); // 历史数据列表
-const topicIndex = ref(0);
+
+const topicIndex = ref(parseInt(chatId.value));
 const topicList = reactive([]);
 // 获取历史数据列表
 const getHistoryList = (uid) => {
   axios
     .post("http://localhost:8888/one/data", {
       uid,
-      postCode: "gdcp",
+      postCode: "gdcpRegisterWebData",
     })
     .then((res) => {
       if (res.status === 200) {
-        // console.log(res.data.historyList);
+        // console.log(res.data);
+
+        // 将退出登录前的最后一次对话同步到chatId
+        chatId.value = res.data.lastChat
+        // 同步用户信息
+        uname.value = res.data.uname
+        email.value = res.data.email
+        phone.value = res.data.phone
+        // console.log(chatId.value);
         // 获取历史列表
         if (res.data.historyList.length !== 0) {
           for (let i = 0; i < res.data.historyList.length; ++i) {
             historyList.value[i] = res.data.historyList[i];
           }
           // console.log(historyList.value);
-          topicList.push(historyList.value[topicIndex.value].history);
-        } else {
+          /**
+           * 前端
+           * 
+           * 历史记录切换系统
+           * 
+           * 功能：
+           * 这里判断topicList必须为空才能将响应的history追加到topicList中
+           * 否则容易在路由切换时重复的追加history导致历史记录切换失败
+           */
+          if (topicList.length == 0) {
+            topicList.push(historyList.value[topicIndex.value].history);
+          }
+          // console.log(topicList);
+        }
+        /**
+         * 前端
+         * 
+         * 注册系统
+         * 
+         * 功能：
+         * 当检测到账号没有历史对话会创建第一个对话
+         */
+        else {
           historyList.value[0] = {
             topicId: "0",
             topic: "新对话",
             history: [],
           };
           topicList.push(historyList.value[topicIndex.value].history);
+          const routeParams = route.params;
+          store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
         }
       }
     });
@@ -186,12 +225,12 @@ const getTopicId = () => {
 
 // 临时的question存放变量
 const tempQuestion = ref("");
-const tempAnswer = ref("这在为您生成答案中.");
+const tempAnswer = ref("正在为您生成答案中.");
 // loadingNewDialog是上传文本按钮的绑定函数
 // 主要是为了实时加载答案这段时间的中间态
 const loadingNewDialog = () => {
   let tempAnswerInterval = null;
-  isUpload.value = !isUpload.value;
+  isUpload.value = true;
   tempQuestion.value = usersInput.value;
   tempAnswerInterval = setInterval(() => {
     tempAnswer.value += ".";
@@ -203,7 +242,7 @@ const loadingNewDialog = () => {
 // 向服务端发送问题（文本）
 const postUsersText = (tempAnswerInterval) => {
   if (usersInput.value == "") {
-    isUpload.value = !isUpload.value;
+    isUpload.value = false;
     return;
   }
   let dialog = { question: "", answer: "" };
@@ -219,21 +258,32 @@ const postUsersText = (tempAnswerInterval) => {
     .then((response) => {
       dialog.answer = response.data.response;
       topicList[0].push(dialog);
-      isUpload.value = !isUpload.value;
+      isUpload.value = false;
       clearInterval(tempAnswerInterval);
-      tempAnswer.value = "这在为您生成答案中.";
+      tempAnswer.value = "正在为您生成答案中.";
+      const routeParams = route.params;
+      store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
     })
     .catch((error) => {
       dialog.answer = "抱歉，网络发生错误，无法获取回答";
       topicList[0].push(dialog);
       console.error("Error sending user input:", error);
-      isUpload.value = !isUpload.value;
+      isUpload.value = false;
       clearInterval(tempAnswerInterval);
-      tempAnswer.value = "这在为您生成答案中.";
+      tempAnswer.value = "正在为您生成答案中.";
+      const routeParams = route.params;
+      store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
     });
 
   usersInput.value = "";
-
+  // 使用表单发送数据
+  // ,
+  //     {
+  //       headers: {
+  //         'Content-Type': 'multipart/form-data'
+  //       }
+  //     }
+  // 使用json发送数据
   //   // headers: {
   //   //   "Content-Type": "application/json",
   //   // },
@@ -241,8 +291,9 @@ const postUsersText = (tempAnswerInterval) => {
 
 // 重新生成答案
 const Reanswer = (index, dialogList) => {
+  isReUpload.value = !isReUpload.value;
   let tempAnswerInterval = null;
-  dialogList[index].answer = "这在为您生成答案中.";
+  dialogList[index].answer = "正在为您生成答案中.";
   tempAnswerInterval = setInterval(() => {
     dialogList[index].answer += ".";
   }, 500);
@@ -252,10 +303,14 @@ const Reanswer = (index, dialogList) => {
     })
     .then((response) => {
       clearInterval(tempAnswerInterval);
+      isReUpload.value = !isReUpload.value;
       dialogList[index].answer = response.data.response;
+      //       const routeParams = route.params;
+      // store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
     })
     .catch((error) => {
       clearInterval(tempAnswerInterval);
+      isReUpload.value = !isReUpload.value;
       dialogList[index].answer = "抱歉，网络发生错误，无法获取回答";
       console.error("Error sending user input:", error);
     });
@@ -347,16 +402,8 @@ const postAdiuo = (recorder) => {
 
   axios({
     method: "post",
-    // url:"http://10.8.7.12:86/chat",
     url: "http://127.0.0.1:8888/one/audio",
     data: audioBlob,
-
-    // headers: {
-    //   "Content-Type": "multipart/form-data",
-    // },
-    // headers: {
-    //     "Content-Type": "application/json",
-    //   },
   }).then((res) => {
     console.log(res.data);
   });
@@ -454,15 +501,18 @@ onMounted(() => {
           chatWindow.scrollHeight - chatWindow.clientHeight;
       }, 100);
       historyList.value.find((value, index, obj) => {
-        // console.log(value);
-        // console.log(index);
+
         if (value.topicId == getTopicId()) {
           topicIndex.value = index;
-          // instance.proxy.$forceUpdate();
+
           topicList.shift();
+
           topicList.push(historyList.value[topicIndex.value].history);
+
         }
       });
+      // const routeParams = route.params;
+      // store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
     },
     { deep: true, immediate: true }
   );
@@ -660,7 +710,7 @@ onBeforeUpdate(() => {
 .chatWindow {
   width: 100%;
   height: 100vh;
-  padding: 0 20% 0 20%;
+  padding: 0 17% 0 23%;
   /* align-items: center; */
   /* height: auto; */
   /* border: 1px red solid; */
@@ -729,6 +779,7 @@ onBeforeUpdate(() => {
 } */
 
 .userText {
+  position: relative;
   max-width: 90%;
   /* background-color: #2f2f2f; */
   color: #f0f8ff;
@@ -740,6 +791,7 @@ onBeforeUpdate(() => {
   display: flex;
   justify-content: start;
   align-items: center;
+
 }
 
 .agentTextBottom .el-button {
@@ -756,10 +808,12 @@ onBeforeUpdate(() => {
   color: #f0f8ff;
   padding: 10px 10px;
   border-radius: 5px;
+  /* padding: 5px; */
 }
 
 .agentText {
   /* border: 1px solid greenyellow; */
+
   max-width: 90%;
   text-align: start;
   /* margin: 10px 0 50px 0; */
@@ -767,9 +821,12 @@ onBeforeUpdate(() => {
   line-height: 24px;
   /* align-items: center; */
   flex-direction: column;
+  position: relative;
+
 }
 
 .userBubble {
+  position: relative;
   display: flex;
   flex-direction: row;
   margin: 100px 0 50px 0;
@@ -791,6 +848,9 @@ onBeforeUpdate(() => {
   display: flex;
   background-color: #f7f7f7;
   border-radius: 100px;
+  /* position: relative; */
+  /* right: 10%; */
+  /* left: -0%; */
 }
 
 .Image img {
@@ -798,9 +858,12 @@ onBeforeUpdate(() => {
 }
 
 .agentImg {
-  margin: 0px 20px 0 0;
+  margin: 0px 10px 0 0;
   width: 50px;
   height: 50px;
+  right: 100%;
+  position: absolute;
+
 }
 
 .agentImg img {
@@ -808,7 +871,9 @@ onBeforeUpdate(() => {
 }
 
 .userImg {
-  margin: 0px 20px 0 0;
+  margin: 0px 10px 0 0;
+  position: absolute;
+  right: 100%;
 }
 
 .chatWindowTitle {

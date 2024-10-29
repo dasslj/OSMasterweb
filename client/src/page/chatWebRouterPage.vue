@@ -44,7 +44,7 @@
                   <Setting />
                 </el-icon>
               </el-menu-item>
-              <el-menu-item index="/" class="mainMenuItem" @click="Logout">
+              <el-menu-item :index="routerStatus" class="mainMenuItem LogoutClass" @click="Logout(uid)">
                 <template #title><span>退出登录</span></template>
                 <el-icon>
                   <Back />
@@ -84,6 +84,7 @@
 </template>
 
 <script setup>
+import axios from "axios";
 import {
   ChatSquare,
   Search,
@@ -99,7 +100,9 @@ import { onMounted, ref, onBeforeMount, reactive } from "vue";
 import { storeToRefs } from "pinia";
 import useShop from "../store/index.js";
 const store = useShop();
-const { isbgBlur, isHide } = storeToRefs(store);
+const { isbgBlur, isHide, chatId, historyList, webVersion, uname, email, phone } =
+  storeToRefs(store);
+
 
 // 关于路由
 import { useRoute, onBeforeRouteUpdate } from "vue-router";
@@ -107,10 +110,9 @@ import router from "../router/index.js";
 // 第一次的时候执行这个函数获取路由参数
 const route = useRoute();
 const routerStatus = ref(window.location.pathname);
-console.log(routerStatus);
 
 let routeParams = route.params;
-
+const uid = routeParams.uid.split(":")[1]
 const routePath = reactive({
   chat: `/chatWeb${routeParams.uid}&${routeParams.uname}/chat`,
   user: `/chatWeb${routeParams.uid}&${routeParams.uname}/user`,
@@ -140,14 +142,48 @@ const imgExceedUpload = (response, uploadFiles) => {
   alert("最多同时上传五张照片");
 };
 
-// 退出登录
-const Logout = () => {
+/**
+ * 前端
+ * 
+ * 退出登录系统
+ * 
+ * @param uid 用于让后端定位用户信息
+ * 
+ * 功能：
+ * 1、退出登录
+ * 2、同时上传用户更改过的数据
+ */
+const Logout = (uid) => {
   localStorage.clear();
+  router.push("/")
+  axios
+    .post("http://localhost:8888/one/data", {
+      uid,
+      postCode: "gdcpDataPost",
+      lastChat: chatId.value,
+      uname: uname.value,
+      email: email.value,
+      phone: phone.value,
+      historyList: historyList.value
+    })
+    .then((res) => {
+      if (res.status == 200) {
+        console.log(res.data);
+
+      }
+    })
+    .catch((e) => {
+      console.log("发生了一些错误：", e);
+    })
+
 };
+
+
 
 onBeforeMount(() => { });
 
-onMounted(() => { });
+onMounted(() => {
+});
 </script>
 
 <style scoped>
@@ -165,9 +201,7 @@ onMounted(() => { });
   background-color: #0e0e0e;
 }
 
-.leftRouter.activate .mainMenuItem:hover {
-  background-color: #2c2c2c;
-}
+
 
 .logo {
   width: 64px;
@@ -221,6 +255,22 @@ onMounted(() => { });
 .mainMenuItem {
   margin: 5px 0;
 }
+
+.leftRouter.activate .mainMenuItem:hover {
+  background-color: #2c2c2c;
+}
+
+.mainMenuItem:hover {
+  color: #ffd04b;
+}
+
+.LogoutClass {
+  color: #ffffff;
+}
+
+/* .LogoutClass:hover {
+  color: #ffd04b;
+} */
 
 .userMenuItem {
   bottom: 0;

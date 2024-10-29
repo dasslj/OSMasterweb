@@ -3,6 +3,7 @@
     { chatHistoryWindowMain: true },
     { active: isHide.bool },
     { Disabled: isUpload },
+    { Disabled: isReUpload }
   ]">
     <div class="chatHistoryLeft">
       <div class="topicTitleCon">
@@ -22,41 +23,37 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onBeforeMount, watch, h } from "vue";
+
+import { ref, reactive, onMounted, onBeforeMount, watch } from "vue";
 import axios from "axios";
-import { DArrowLeft, DArrowRight } from "@element-plus/icons-vue";
 import { storeToRefs } from "pinia";
 import useShop from "../store/index.js";
 
 // 关于路由
-import { useRoute, onBeforeRouteUpdate } from "vue-router";
+import { useRoute } from "vue-router";
 import router from "../router/index.js";
 
 // 第一次的时候执行这个函数获取路由参数
 const route = useRoute();
 
 const store = useShop();
-const { chatId, historyList, isUpload, isHide } = storeToRefs(store);
+const { chatId, historyList, isUpload, isReUpload, isHide, uname, email, phone } = storeToRefs(store);
 
 // 历史数据列表
-// const historyList = reactive([]);
 // 获取历史数据列表
 
 const getHistoryList = (uid) => {
   axios
     .post("http://localhost:8888/one/data", {
       uid,
-      postCode: "gdcp",
+      postCode: "gdcpRegisterWebData",
     })
     .then((res) => {
       if (res.status === 200) {
-        // console.log(res.data.historyList);
         // 获取历史列表
         for (let i = 0; i < res.data.historyList.length; ++i) {
           historyList.value[i] = res.data.historyList[i];
         }
-        // console.log(historyList.value);
-        // topicList.push(historyList.value[topicIndex.value].history);
       }
     });
 };
@@ -78,9 +75,10 @@ const keepRegister = () => {
 };
 
 const getHistory = (topic) => {
-  // console.log(topic);
   chatId.value = topic.topicId;
-  // console.log(chatId.value);
+  const routeParams = route.params;
+  store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
+
 };
 // 创建新的对话
 const newChat = () => {
@@ -103,6 +101,8 @@ watch(
         value.topic = value.history[0].question;
       }
     });
+
+
   },
   { deep: true, immediate: true }
 );
@@ -119,7 +119,6 @@ onMounted(() => {
 <style>
 .chatHistoryWindowMain {
   background: linear-gradient(270deg, #212121, #111111);
-  /* background-color: #000; */
   z-index: -1;
   transition: 0.5s;
   display: flex;
