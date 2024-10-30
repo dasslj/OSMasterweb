@@ -13,8 +13,9 @@
           </div> -->
                 <p>请使用手机号或者邮箱登录</p>
                 <div class="inputList">
-                  <input placeholder="手机号/邮箱" v-model="registerForm.account" />
-                  <input placeholder="密码" type="password" v-model="registerForm.password" />
+                  <input placeholder="手机号/邮箱" v-model="registerForm.account" @keydown.enter="userRegister" />
+                  <input placeholder="密码" type="password" v-model="registerForm.password"
+                    @keydown.enter="userRegister" />
                 </div>
                 <el-button @click="userRegister">登 录</el-button>
               </div>
@@ -50,10 +51,11 @@
           </div> -->
               <p>请使用手机号或者邮箱登录</p>
               <div class="inputList">
-                <input placeholder="用户名" v-model="loginForm.uname" />
-                <input placeholder="手机号/邮箱" v-model="emailOrPhone" />
-                <input placeholder="密码" type="password" v-model="loginForm.password" />
-                <input placeholder="确认密码" type="password" v-model="loginForm.passwordAgain" />
+                <input placeholder="用户名" v-model="loginForm.uname" @keydown.enter="userLogin" />
+                <input placeholder="手机号/邮箱" v-model="emailOrPhone" @keydown.enter="userLogin" />
+                <input placeholder="密码" type="password" v-model="loginForm.password" @keydown.enter="userLogin" />
+                <input placeholder="确认密码" type="password" v-model="loginForm.passwordAgain"
+                  @keydown.enter="userLogin" />
               </div>
               <el-button @click="userLogin">注 册</el-button>
             </div>

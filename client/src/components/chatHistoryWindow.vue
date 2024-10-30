@@ -11,18 +11,33 @@
       </div>
       <div class="chatHistory">
         <div :class="[{ topic: true }, { topicActive: item.topicId == chatId }]" v-for="(item, index) in historyList"
-          :key="index" @click="getHistory(item)">
-          {{ item.topic }}
+          :key="index">
+          <div class="topicContent" @click="getHistory(item)">{{ item.topic }}</div>
+          <div class="topicSetting">
+            <div class="BGfuzzy"></div>
+            <el-button @click="deleteTopic(item, index)">
+              <!-- 1111 -->
+              <Delete style="height: 20px; width: 20px;" />
+            </el-button>
+          </div>
+
+
         </div>
       </div>
       <div class="newBtnCon">
-        <div class="newHistoryBtu" @click="newChat">+ 新的话题</div>
+        <div class="newHistoryBtu" @click="newChat">
+          + 新的话题
+
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import {
+  Delete
+} from "@element-plus/icons-vue";
 
 import { ref, reactive, onMounted, onBeforeMount, watch } from "vue";
 import axios from "axios";
@@ -107,6 +122,18 @@ watch(
   { deep: true, immediate: true }
 );
 
+// 
+const deleteTopic = (item, index) => {
+  let isDelete = confirm(`确定要删除${item.topic}这个对话吗`)
+  if (isDelete) {
+    historyList.value.splice(index, 1)
+    const routeParams = route.params;
+    store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
+
+  }
+}
+
+
 // 页面渲染之前
 onBeforeMount(() => {
   keepRegister();
@@ -171,11 +198,11 @@ onMounted(() => {
 
 .topic {
   color: #6b6c6d;
-  white-space: nowrap;
+  /* white-space: nowrap; */
   /* 禁止文本换行 */
   overflow: hidden;
   /* 隐藏超出范围的内容 */
-  text-overflow: ellipsis;
+  /* text-overflow: ellipsis; */
   /* 使用省略号 */
   width: 100%;
   /* margin: 0px auto; */
@@ -186,7 +213,8 @@ onMounted(() => {
   cursor: pointer;
   border-radius: 100px;
   transition: 0.5s;
-  text-align: center;
+  position: relative;
+
 }
 
 .topic:hover {
@@ -195,9 +223,68 @@ onMounted(() => {
 
 }
 
+
+
 .topicActive {
   color: #ffd04b;
   background-color: #353535;
+}
+
+.topicContent {
+  /* 禁止文本换行 */
+  white-space: nowrap;
+  /* 使用省略号 */
+  overflow: hidden;
+  /* 隐藏超出范围的内容 */
+  text-overflow: ellipsis;
+  width: 100%;
+  padding: 0 15px;
+  text-align: center;
+}
+
+.topicSetting {
+  z-index: 400;
+  transition: 0.5s;
+  position: absolute;
+  top: 50%;
+  transform: translate(100%, -50%);
+  right: 0%;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: end;
+}
+
+.topic:hover .topicSetting {
+
+  position: absolute;
+  transform: translateY(-50%);
+  margin: 0 10px 0 0;
+  height: 100%;
+  transition: 0.5s;
+}
+
+.topicSetting .BGfuzzy {
+  width: 20px;
+  height: 60px;
+  background: linear-gradient(-90deg, rgba(53, 53, 53, 1), rgba(53, 53, 53, 0));
+  transition: 0.5s;
+}
+
+.topicSetting .el-button {
+  transition: 0.5s;
+  background-color: rgb(53, 53, 53);
+  width: 40px;
+  height: 40px;
+  color: #c0c0c0;
+  border: none;
+}
+
+.topicSetting .el-button:hover {
+
+  color: #ffd04b;
+
 }
 
 .newBtnCon {
