@@ -3,7 +3,7 @@
     <div :class="{ bgBlur: isbgBlur, mainCol: true }">
       <div class="mainRow">
         <!-- 左侧的导航 -->
-        <div :class="[{ leftRouter: true, activate: isHide.bool }]">
+        <div :class="[{ leftRouter: true, activate: isHide }]">
           <el-menu :default-active="routerStatus" class="mainMenu" active-text-color="#ffd04b" background-color="none"
             text-color="#fff" router="true" mode="vertical" collapse="true">
             <div class="commonMenuItem">
@@ -125,15 +125,14 @@ const uploadRef = ref("");
 
 // 控制背景失焦的函数
 const blurToBG = () => {
-  isbgBlur.value = !isbgBlur.value;
-  console.log(isbgBlur.value);
+  isbgBlur.value = false
 };
 
 // 图片上传成功后的回调函数 (未完成还需要与后端对接)
 const imgSuccessUpload = (response, uploadFile, uploadFiles) => {
   setTimeout(() => {
     uploadRef.value.clearFiles();
-    isbgBlur.value = !isbgBlur.value;
+    blurToBG()
   }, 1000);
 };
 
@@ -147,7 +146,7 @@ const imgExceedUpload = (response, uploadFiles) => {
  * 
  * 退出登录系统
  * 
- * @param uid 用于让后端定位用户信息
+ * @param uid 用户id，用于让后端定位用户信息
  * 
  * 功能：
  * 1、退出登录
@@ -179,17 +178,14 @@ const Logout = (uid) => {
 };
 
 
-
+// 页面渲染之前的钩子函数
 onBeforeMount(() => { });
-
+// 页面渲染之后的钩子函数
 onMounted(() => {
 });
 </script>
 
 <style scoped>
-/* .el-menu--horizontal {
-  --el-menu-horizontal-height: 100px;
-} */
 .leftRouter {
   border-right: #c0c0c0 3px solid;
   z-index: 1000;

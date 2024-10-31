@@ -1,7 +1,17 @@
 import axios from "axios";
 export default {
-    // 更新数据
-    postDataTOServer(uid, chatId, uname, email, phone, historyList) {
+    /** 
+     * 前端
+     * 
+     * 数据上传系统
+     * 
+     * 功能：将所有的用户数据上传给后端
+     * 
+     * 注意：目前这个函数没有完善，有很严重的性能问题，需要优化，所有在这条注意没有修改前，请不要使用它（除了我）
+     *      
+     * 
+    */
+    postDataTOServer(uid = "", chatId = "", uname = "", email = "", phone = "", historyList = []) {
 
         axios
             .post("http://localhost:8888/one/data", {

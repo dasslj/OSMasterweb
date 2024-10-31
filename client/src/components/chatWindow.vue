@@ -3,8 +3,11 @@
     <!-- <div class="chatWindowTitle"></div> -->
     <el-col>
       <div class="chatWindow">
-        <div class="BGfuzzyTop"
-          style="top: 0%;background: linear-gradient(180deg, rgba(44, 44, 44, 1), rgba(44, 44, 44, 0)); "></div>
+        <div class="BGfuzzyTop" style="top: 0%;
+          background: linear-gradient(180deg, rgba(44, 44, 44, 1), rgba(44, 44, 44, 0)); 
+          left: 50%;
+          transform: translateX(-50%);">
+        </div>
         <div class="placehoderBox"></div>
         <div class="agentBubble" id="firstAgentBubble">
 
@@ -107,8 +110,11 @@
 </template>
 
 <script setup>
+
+// 导入axios库
 import axios from "axios";
-import querystring from "querystring";
+
+// 导入element-plus库的内置图标
 import {
   Search,
   Microphone,
@@ -119,6 +125,8 @@ import {
   ArrowDownBold,
   ArrowUpBold
 } from "@element-plus/icons-vue";
+
+// 导入vue3自带的函数
 import {
   ref,
   onMounted,
@@ -126,38 +134,64 @@ import {
   onBeforeUpdate,
   reactive,
   watch,
-  getCurrentInstance,
 } from "vue";
-import Recorder from "js-audio-recorder";
+
+// 导入vue-router库，以及相关配置
+import router from "../router/index.js";
+import { useRoute } from "vue-router";
+const route = useRoute();
+
+// 导入pinia库，以及相关配置
 import { storeToRefs } from "pinia";
 import useShop from "../store/index.js";
-import { useRoute } from "vue-router";
-import router from "../router/index.js";
 const store = useShop();
 const { isbgBlur, chatId, isUpload, isReUpload, historyList, webVersion, uname, email, phone } =
   storeToRefs(store);
 
 
-
-// 第一次的时候执行这个函数获取路由参数
-const route = useRoute();
-
-const usersInput = ref("");
-let chatWindowScroll = null;
-const instance = getCurrentInstance();
-const microphoneStatus = ref(false);
-const isGotoTop = ref(false)
-// console.log(isUpload.value);
+//导入@vueuse/core库以及相关函数
 import { useClipboard } from "@vueuse/core";
-//导入 text 复制的内容、 isSupported 浏览器是否支持复制、copy 复制函数
+//  text 复制的内容、 isSupported 浏览器是否支持复制、copy 复制函数
 const { text, isSupported, copy } = useClipboard();
-// 后端地址
-const AGENT_URL = "http://127.0.0.1:5000/chat";
+
+/**
+ * 下面是初始化本页面需要的响应式数据
+ */
+const usersInput = ref("");  // usersInput是用户输入框的双向绑定字符串数据，与发送问题系统相关
+const microphoneStatus = ref(false);  // microphoneStatus是麦克风是否开启的状态数据，与音转文系统相关
+const isGotoTop = ref(false)          // isGotoTop是判断用户想要去 顶部 还是 底部 的状态数据，与移动系统相关
+const topicIndex = ref(0);   // topicIndex是用于回去当前topicList在historyList的索引，与切换对话系统相关
+const topicList = reactive([]);  // topicList是用于存储当前对话的List，与切换对话系统、数据加载系统等相关
+const tempQuestion = ref("");  // 临时的question存放变量
+const tempAnswer = ref("正在为您生成答案中.");
 
 
-const topicIndex = ref(parseInt(chatId.value));
-const topicList = reactive([]);
+/**
+ * 下面是初始化本页面需要的常量或变量
+ */
+// 后端地址，前端向大模型提问的接口地址，与发送问题系统相关
+const AGENT_URL = "http://10.8.7.12:86/chat";
+// 让对话保持在底部的计时器，与发送问题系统相关
+let chatWindowScroll = null;
+
+
+
 // 获取历史数据列表
+
+/**
+ * 前端
+ * 
+ * 数据加载系统
+ * 
+ * @param uid 用户id，用于让后端定位用户信息
+ * 
+ * 功能：
+ *      1、获取历史数据列表，用于显示当前对话的历史记录，以及同步用户信息
+ *      2、同时会给新建用户创建第一个对话
+ *      
+ * 注意：与chatHistoryWindow.vue的getHistoryList功能类似，但是比它的复杂
+ * 
+ */
 const getHistoryList = (uid) => {
   axios
     .post("http://localhost:8888/one/data", {
@@ -166,8 +200,6 @@ const getHistoryList = (uid) => {
     })
     .then((res) => {
       if (res.status === 200) {
-        // console.log(res.data);
-
         // 将退出登录前的最后一次对话同步到chatId
         chatId.value = res.data.lastChat
         // 同步用户信息
@@ -184,11 +216,11 @@ const getHistoryList = (uid) => {
           /**
            * 前端
            * 
-           * 历史记录切换系统
+           * 切换对话系统
            * 
            * 功能：
-           * 这里判断topicList必须为空才能将响应的history追加到topicList中
-           * 否则容易在路由切换时重复的追加history导致历史记录切换失败
+           *      1、这里判断topicList必须为空才能将响应的history追加到topicList中
+           *         否则容易在路由切换时重复的追加history导致历史记录切换失败
            */
           if (topicList.length == 0) {
             topicList.push(historyList.value[topicIndex.value].history);
@@ -201,7 +233,7 @@ const getHistoryList = (uid) => {
          * 注册系统
          * 
          * 功能：
-         * 当检测到账号没有历史对话会创建第一个对话
+         *     当检测到账号没有历史对话会创建第一个对话
          */
         else {
           historyList.value[0] = {
@@ -217,15 +249,6 @@ const getHistoryList = (uid) => {
     });
 };
 
-// 获取当前对话的id
-const getTopicId = () => {
-  // console.log(chatId.value);
-  return chatId.value;
-};
-
-// 临时的question存放变量
-const tempQuestion = ref("");
-const tempAnswer = ref("正在为您生成答案中.");
 // loadingNewDialog是上传文本按钮的绑定函数
 // 主要是为了实时加载答案这段时间的中间态
 const loadingNewDialog = () => {
@@ -305,7 +328,7 @@ const Reanswer = (index, dialogList) => {
       clearInterval(tempAnswerInterval);
       isReUpload.value = !isReUpload.value;
       dialogList[index].answer = response.data.response;
-      //       const routeParams = route.params;
+      // const routeParams = route.params;
       // store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
     })
     .catch((error) => {
@@ -313,6 +336,8 @@ const Reanswer = (index, dialogList) => {
       isReUpload.value = !isReUpload.value;
       dialogList[index].answer = "抱歉，网络发生错误，无法获取回答";
       console.error("Error sending user input:", error);
+      // const routeParams = route.params;
+      // store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
     });
 };
 
@@ -347,67 +372,6 @@ window.onwheel = function (ev) {
   // console.log(ev);
 };
 
-// 开启录音
-const startRecord = () => {
-  const recorder = new Recorder();
-  Recorder.getPermission().then(() => {
-    if (microphoneStatus.value) {
-      console.log("录音停止");
-      recorder.stop();
-      // recorder.play(); // 播放录音
-      microphoneStatus.value = !microphoneStatus.value;
-
-      // 保存录音到本地
-      // 是否下载录音
-      const isSaveAudio = window.confirm("是否保存录音");
-      if (isSaveAudio) {
-        saveAudioToLocal(recorder);
-      }
-      // 发送录音到服务器
-      const isPostAudio = window.confirm("是否上传录音");
-      if (isPostAudio) {
-        postAdiuo(recorder);
-      }
-    } else {
-      console.log("开始录音");
-      recorder.start();
-      microphoneStatus.value = !microphoneStatus.value;
-    }
-  });
-};
-
-// 将录音上传到本地
-const saveAudioToLocal = (recorder) => {
-  recorder.downloadWAV(new Date().getTime() + "录音");
-};
-
-// 向服务端发送问题（语音）（未完成）
-const postAdiuo = (recorder) => {
-  console.log("发送语音");
-  const formData = new FormData();
-  const blob = recorder.getWAVBlob(); // 获取wav格式音频数据
-  const audioBlob = new Blob([blob], { type: "audio/wav" });
-  const fileOfBlob = new File([audioBlob], new Date().getTime() + ".wav");
-  formData.append("file", audioBlob);
-  formData.append("id", 1);
-  formData.append("name", "Audio");
-  // axios.post(url, formData).then((res) => {
-  //   console.log(res.data.data[0].url);
-  // });
-  console.log(blob);
-  console.log(audioBlob);
-  console.log(fileOfBlob);
-
-  console.dir(formData.get("file"));
-
-  axios({
-    method: "post",
-    url: "http://127.0.0.1:8888/one/audio",
-    data: audioBlob,
-  }).then((res) => {
-    console.log(res.data);
-  });
-};
 
 // 语音识别
 let recognition;
@@ -491,7 +455,22 @@ onMounted(() => {
     }
     clearInterval(chatWindowScroll);
   });
-  // 使用变量检测器，做历史对话切换
+
+
+  /**
+   * 前端
+   * 
+   * 切换对话系统
+   * 
+   * 功能：
+   *      1、使用vue项目自带的watch，监测piaio中的chatId
+   *      2、当chatId发生改变后，通过修改topicList从而实现对话修改
+   * 
+   * 注意：
+   *      1、topicList的数据结构是:[[{question:...,answer:...},{question:...,answer:...},......]]
+   * 
+   * 更多在chatHistoryWindow.vue查找:切换对话系统
+   */
   watch(
     chatId,
     (newData, oldData) => {
@@ -502,17 +481,13 @@ onMounted(() => {
       }, 100);
       historyList.value.find((value, index, obj) => {
 
-        if (value.topicId == getTopicId()) {
+        if (value.topicId == chatId.value) {
           topicIndex.value = index;
-
           topicList.shift();
-
           topicList.push(historyList.value[topicIndex.value].history);
 
         }
       });
-      // const routeParams = route.params;
-      // store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
     },
     { deep: true, immediate: true }
   );

@@ -4,9 +4,9 @@
       <!-- 左侧的聊天记录  v-if="!isHide.bool"-->
       <el-col :span="chatPageSpan.chatHistoryWindow">
         <chatHistoryWindow></chatHistoryWindow>
-        <div :class="[{ hideBtuMain: true, active: isHide.bool }]" @click="hideHistoryWindow">
+        <div :class="[{ hideBtuMain: true, active: isHide }]" @click="hideHistoryWindow">
           <div class="hideButton" title="打开历史记录">
-            <div v-if="isHide.bool">
+            <div v-if="isHide">
               <ArrowRightBold />
             </div>
             <div v-else>
@@ -15,11 +15,6 @@
           </div>
         </div>
       </el-col>
-
-
-
-
-
       <!-- 右侧的聊天框 -->
       <el-col :span="chatPageSpan.chatWindow">
         <chatWindow></chatWindow>
@@ -31,6 +26,8 @@
 </template>
 
 <script setup>
+
+// 导入element-plus库的内置图标
 import {
   ChatSquare,
   Search,
@@ -40,30 +37,49 @@ import {
   ArrowRightBold,
   ArrowLeftBold
 } from "@element-plus/icons-vue";
+
+// 导入自定义的组件
 import chatWindow from "../components/chatWindow.vue";
 import chatHistoryWindow from "../components/chatHistoryWindow.vue";
+
+// 导入vue3自带的函数
 import { reactive, ref } from "vue";
+
+// 导入pinia库，以及相关配置
 import { storeToRefs } from "pinia";
 import useShop from "../store/index.js";
 const store = useShop();
 const { isHide } = storeToRefs(store);
+
+/**
+ * 下面是初始化本页面需要的响应式数据
+ */
+// chatPageSpan存放的是chatHistoryWindow组件和chatWindow组件在显示位置的占比值
 const chatPageSpan = reactive({
   chatHistoryWindow: 4,
   chatWindow: 20
 })
-// 隐藏历史
+
+/**
+ * 前端
+ * 
+ * 历史记录隐藏系统
+ * 
+ * 功能：
+ *      通过element-plus的el-col布局的span属性实现chatWindow和chatHistoryWindow在展示位置的占比修改
+ * 
+ */
+
 const hideHistoryWindow = () => {
-
-  isHide.value.bool = !isHide.value.bool
-
+  isHide.value = !isHide.value
   // 隐藏
-  if (isHide.value.bool) {
+  if (isHide.value) {
     chatPageSpan.chatWindow = 23
     chatPageSpan.chatHistoryWindow = 1
   }
 
   // 打开
-  if (!isHide.value.bool) {
+  if (!isHide.value) {
     chatPageSpan.chatWindow = 20
     chatPageSpan.chatHistoryWindow = 4
   }

@@ -1,7 +1,7 @@
 <template>
   <div :class="[
     { chatHistoryWindowMain: true },
-    { active: isHide.bool },
+    { active: isHide },
     { Disabled: isUpload },
     { Disabled: isReUpload }
   ]">
@@ -12,22 +12,18 @@
       <div class="chatHistory">
         <div :class="[{ topic: true }, { topicActive: item.topicId == chatId }]" v-for="(item, index) in historyList"
           :key="index">
-          <div class="topicContent" @click="getHistory(item)">{{ item.topic }}</div>
+          <div class="topicContent" @click="getHistory(item.topicId)">{{ item.topic }}</div>
           <div class="topicSetting">
             <div class="BGfuzzy"></div>
             <el-button @click="deleteTopic(item, index)">
-              <!-- 1111 -->
               <Delete style="height: 20px; width: 20px;" />
             </el-button>
           </div>
-
-
         </div>
       </div>
       <div class="newBtnCon">
         <div class="newHistoryBtu" @click="newChat">
           + 新的话题
-
         </div>
       </div>
     </div>
@@ -35,27 +31,43 @@
 </template>
 
 <script setup>
+
+// 导入element-plus库的内置图标
 import {
   Delete
 } from "@element-plus/icons-vue";
 
+// 导入vue3自带的函数
 import { ref, reactive, onMounted, onBeforeMount, watch } from "vue";
+
+// 导入axios库
 import axios from "axios";
+
+// 导入pinia库，以及相关配置
 import { storeToRefs } from "pinia";
 import useShop from "../store/index.js";
-
-// 关于路由
-import { useRoute } from "vue-router";
-import router from "../router/index.js";
-
-// 第一次的时候执行这个函数获取路由参数
-const route = useRoute();
-
 const store = useShop();
 const { chatId, historyList, isUpload, isReUpload, isHide, uname, email, phone } = storeToRefs(store);
 
-// 历史数据列表
-// 获取历史数据列表
+
+// 导入vue-router库，以及相关配置
+import { useRoute } from "vue-router";
+import router from "../router/index.js";
+const route = useRoute();
+
+
+
+/**
+ * 前端
+ * 
+ * 数据加载系统
+ * 
+ * @param uid 用户id，用于让后端定位用户信息
+ * 
+ * 功能：
+ *      获取历史数据列表，用于显示历史记录（与chatWindow.vue的getHistoryList功能类似，但是比它的简单）
+ *      
+ */
 
 const getHistoryList = (uid) => {
   axios
@@ -73,7 +85,21 @@ const getHistoryList = (uid) => {
     });
 };
 
+
+
 // 这是为了防止别人直接输账号可以进入
+
+/**
+ * 前端
+ * 
+ * 退出系统
+ * 
+ * 功能：
+ *      1、用户刷新页面后，不需要重新登录
+ *      2、防止其他人拿到用户用户登录之后，可以直接进入
+ * 
+ */
+
 const keepRegister = () => {
   let routeParams = route.params;
   try {
@@ -89,13 +115,40 @@ const keepRegister = () => {
   }
 };
 
-const getHistory = (topic) => {
-  chatId.value = topic.topicId;
+/**
+ * 前端
+ * 
+ * 切换对话系统
+ * 
+ * @param topicId 要切换到的对话，主要使用topic中的topicId 
+ * 
+ * 功能：
+ *      修改在piaio仓库中的chatId，从而实现切换对话
+ * 
+ * 更多在chatWindow.vue查找:切换对话系统
+ */
+
+const getHistory = (topicId) => {
+  chatId.value = topicId;
   const routeParams = route.params;
   store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
 
 };
+
+
 // 创建新的对话
+
+/**
+ * 前端
+ * 
+ * 对话增删系统
+ * 
+ * 功能：
+ *      1、新增一个新对话
+ * 
+ * 注意：
+ *      1、新增对话后，不会立即更新到后端的数据库，只有在进行第一次会话对话后才会更新
+ */
 const newChat = () => {
   const topicId = "" + Date.now();
   let newTopic = {
@@ -108,21 +161,19 @@ const newChat = () => {
   chatId.value = topicId;
 };
 
-watch(
-  historyList,
-  (newData, oldData) => {
-    historyList.value.find((value, index, list) => {
-      if (value.topic == "新对话" && value.history.length != 0) {
-        value.topic = value.history[0].question;
-      }
-    });
 
+/**
+ * 前端
+ * 
+ * 对话增删系统
+ * 
+ * 功能：
+ *      1、删除指定的对话
+ * 
+ * 注意：
+ *      1、删除会话后，在用户确认后会立即更新到后端
+ */
 
-  },
-  { deep: true, immediate: true }
-);
-
-// 
 const deleteTopic = (item, index) => {
   let isDelete = confirm(`确定要删除${item.topic}这个对话吗`)
   if (isDelete) {
@@ -133,11 +184,39 @@ const deleteTopic = (item, index) => {
   }
 }
 
+/**
+ * 前端
+ * 
+ * 对话增删系统
+ * 
+ * 功能：
+ *      1、将新的对话名修改为第一次提的问题
+ *        （1）使用vue自带的watch监测piaio的historyList
+ *        （2）如果发现有对话名为：新对话，且history中对话不为零，则将对话名修改为第一次提的问题
+ * 
+ */
 
-// 页面渲染之前
+watch(
+  historyList,
+  (newData, oldData) => {
+    historyList.value.find((value, index, list) => {
+      if (value.topic == "新对话" && value.history.length != 0) {
+        value.topic = value.history[0].question;
+        const routeParams = route.params;
+        store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
+      }
+    });
+  },
+  { deep: true, immediate: true }
+);
+
+
+// 页面渲染之前的钩子函数
 onBeforeMount(() => {
   keepRegister();
 });
+
+// 页面渲染之后的钩子函数
 onMounted(() => {
   keepRegister();
 });
@@ -247,9 +326,11 @@ onMounted(() => {
   transition: 0.5s;
   position: absolute;
   top: 50%;
-  transform: translate(100%, -50%);
+  background-color: rgba(53, 53, 53, 1);
+  /* transform: translate(100%, -50%); */
+  transform: translate(0%, -50%);
   right: 0%;
-
+  opacity: 0;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -259,8 +340,9 @@ onMounted(() => {
 .topic:hover .topicSetting {
 
   position: absolute;
-  transform: translateY(-50%);
-  margin: 0 10px 0 0;
+  /* transform: translateY(-50%);  */
+  opacity: 1;
+  padding: 0 10px 0 0;
   height: 100%;
   transition: 0.5s;
 }
@@ -270,6 +352,9 @@ onMounted(() => {
   height: 60px;
   background: linear-gradient(-90deg, rgba(53, 53, 53, 1), rgba(53, 53, 53, 0));
   transition: 0.5s;
+  position: relative;
+  /* right: 100%; */
+  left: -20px;
 }
 
 .topicSetting .el-button {
