@@ -1,41 +1,43 @@
 <template>
-  <div :class="[
-    { chatHistoryWindowMain: true },
-    { active: isHide },
-    { Disabled: isUpload },
-    { Disabled: isReUpload }
-  ]">
+  <div
+    :class="[
+      { chatHistoryWindowMain: true },
+      { active: isHide },
+      { Disabled: isUpload },
+      { Disabled: isReUpload },
+    ]"
+  >
     <div class="chatHistoryLeft">
       <div class="topicTitleCon">
         <h4 class="topicTitle">历史对话</h4>
       </div>
       <div class="chatHistory">
-        <div :class="[{ topic: true }, { topicActive: item.topicId == chatId }]" v-for="(item, index) in historyList"
-          :key="index">
-          <div class="topicContent" @click="getHistory(item.topicId)">{{ item.topic }}</div>
+        <div
+          :class="[{ topic: true }, { topicActive: item.topicId == chatId }]"
+          v-for="(item, index) in historyList"
+          :key="index"
+        >
+          <div class="topicContent" @click="getHistory(item.topicId)">
+            {{ item.topic }}
+          </div>
           <div class="topicSetting">
             <div class="BGfuzzy"></div>
             <el-button @click="deleteTopic(item, index)">
-              <Delete style="height: 20px; width: 20px;" />
+              <Delete style="height: 20px; width: 20px" />
             </el-button>
           </div>
         </div>
       </div>
       <div class="newBtnCon">
-        <div class="newHistoryBtu" @click="newChat">
-          + 新的话题
-        </div>
+        <div class="newHistoryBtu" @click="newChat">+ 新的话题</div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-
 // 导入element-plus库的内置图标
-import {
-  Delete
-} from "@element-plus/icons-vue";
+import { Delete } from "@element-plus/icons-vue";
 
 // 导入vue3自带的函数
 import { ref, reactive, onMounted, onBeforeMount, watch } from "vue";
@@ -47,26 +49,32 @@ import axios from "axios";
 import { storeToRefs } from "pinia";
 import useShop from "../store/index.js";
 const store = useShop();
-const { chatId, historyList, isUpload, isReUpload, isHide, uname, email, phone } = storeToRefs(store);
-
+const {
+  chatId,
+  historyList,
+  isUpload,
+  isReUpload,
+  isHide,
+  uname,
+  email,
+  phone,
+} = storeToRefs(store);
 
 // 导入vue-router库，以及相关配置
 import { useRoute } from "vue-router";
 import router from "../router/index.js";
 const route = useRoute();
 
-
-
 /**
  * 前端
- * 
+ *
  * 数据加载系统
- * 
+ *
  * @param uid 用户id，用于让后端定位用户信息
- * 
+ *
  * 功能：
  *      获取历史数据列表，用于显示历史记录（与chatWindow.vue的getHistoryList功能类似，但是比它的简单）
- *      
+ *
  */
 
 const getHistoryList = (uid) => {
@@ -85,19 +93,17 @@ const getHistoryList = (uid) => {
     });
 };
 
-
-
 // 这是为了防止别人直接输账号可以进入
 
 /**
  * 前端
- * 
+ *
  * 退出系统
- * 
+ *
  * 功能：
  *      1、用户刷新页面后，不需要重新登录
  *      2、防止其他人拿到用户用户登录之后，可以直接进入
- * 
+ *
  */
 
 const keepRegister = () => {
@@ -117,35 +123,40 @@ const keepRegister = () => {
 
 /**
  * 前端
- * 
+ *
  * 切换对话系统
- * 
- * @param topicId 要切换到的对话，主要使用topic中的topicId 
- * 
+ *
+ * @param topicId 要切换到的对话，主要使用topic中的topicId
+ *
  * 功能：
  *      修改在piaio仓库中的chatId，从而实现切换对话
- * 
+ *
  * 更多在chatWindow.vue查找:切换对话系统
  */
 
 const getHistory = (topicId) => {
   chatId.value = topicId;
   const routeParams = route.params;
-  store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
-
+  store.postDataTOServer(
+    routeParams.uid.split(":")[1],
+    chatId.value,
+    uname.value,
+    email.value,
+    phone.value,
+    historyList.value
+  );
 };
-
 
 // 创建新的对话
 
 /**
  * 前端
- * 
+ *
  * 对话增删系统
- * 
+ *
  * 功能：
  *      1、新增一个新对话
- * 
+ *
  * 注意：
  *      1、新增对话后，不会立即更新到后端的数据库，只有在进行第一次会话对话后才会更新
  */
@@ -161,39 +172,44 @@ const newChat = () => {
   chatId.value = topicId;
 };
 
-
 /**
  * 前端
- * 
+ *
  * 对话增删系统
- * 
+ *
  * 功能：
  *      1、删除指定的对话
- * 
+ *
  * 注意：
  *      1、删除会话后，在用户确认后会立即更新到后端
  */
 
 const deleteTopic = (item, index) => {
-  let isDelete = confirm(`确定要删除${item.topic}这个对话吗`)
+  let isDelete = confirm(`确定要删除${item.topic}这个对话吗`);
   if (isDelete) {
-    historyList.value.splice(index, 1)
+    historyList.value.splice(index, 1);
     const routeParams = route.params;
-    store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
-
+    store.postDataTOServer(
+      routeParams.uid.split(":")[1],
+      chatId.value,
+      uname.value,
+      email.value,
+      phone.value,
+      historyList.value
+    );
   }
-}
+};
 
 /**
  * 前端
- * 
+ *
  * 对话增删系统
- * 
+ *
  * 功能：
  *      1、将新的对话名修改为第一次提的问题
  *        （1）使用vue自带的watch监测piaio的historyList
  *        （2）如果发现有对话名为：新对话，且history中对话不为零，则将对话名修改为第一次提的问题
- * 
+ *
  */
 
 watch(
@@ -203,13 +219,19 @@ watch(
       if (value.topic == "新对话" && value.history.length != 0) {
         value.topic = value.history[0].question;
         const routeParams = route.params;
-        store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
+        store.postDataTOServer(
+          routeParams.uid.split(":")[1],
+          chatId.value,
+          uname.value,
+          email.value,
+          phone.value,
+          historyList.value
+        );
       }
     });
   },
   { deep: true, immediate: true }
 );
-
 
 // 页面渲染之前的钩子函数
 onBeforeMount(() => {
@@ -293,16 +315,12 @@ onMounted(() => {
   border-radius: 100px;
   transition: 0.5s;
   position: relative;
-
 }
 
 .topic:hover {
   color: #ffd04b;
   background-color: #353535;
-
 }
-
-
 
 .topicActive {
   color: #ffd04b;
@@ -338,7 +356,6 @@ onMounted(() => {
 }
 
 .topic:hover .topicSetting {
-
   position: absolute;
   /* transform: translateY(-50%);  */
   opacity: 1;
@@ -367,9 +384,7 @@ onMounted(() => {
 }
 
 .topicSetting .el-button:hover {
-
   color: #ffd04b;
-
 }
 
 .newBtnCon {

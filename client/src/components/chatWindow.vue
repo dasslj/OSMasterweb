@@ -3,14 +3,21 @@
     <!-- <div class="chatWindowTitle"></div> -->
     <el-col>
       <div class="chatWindow">
-        <div class="BGfuzzyTop" style="top: 0%;
-          background: linear-gradient(180deg, rgba(44, 44, 44, 1), rgba(44, 44, 44, 0)); 
-          left: 50%;
-          transform: translateX(-50%);">
-        </div>
+        <div
+          class="BGfuzzyTop"
+          style="
+            top: 0%;
+            background: linear-gradient(
+              180deg,
+              rgba(44, 44, 44, 1),
+              rgba(44, 44, 44, 0)
+            );
+            left: 50%;
+            transform: translateX(-50%);
+          "
+        ></div>
         <div class="placehoderBox"></div>
         <div class="agentBubble" id="firstAgentBubble">
-
           <div class="agentText">
             <div class="agentImg Image">
               <img src="../assets/MdiLinux.svg" alt="" />
@@ -24,7 +31,6 @@
           <!-- {{ item }} -->
           <div class="bubbleList">
             <div class="userBubble">
-
               <div class="userText">
                 <div class="userImg Image">
                   <img src="../assets/MdiAccount.svg" alt="" />
@@ -34,17 +40,24 @@
             </div>
 
             <div class="agentBubble">
-
               <div class="agentText">
                 <div class="agentImg Image">
                   <img src="../assets/MdiLinux.svg" alt="" />
                 </div>
                 <div class="agentTextContent">
-                  {{ item.answer }}
+                  <div v-html="item.answer"></div>
                 </div>
                 <div class="agentTextBottom">
-                  <el-button :icon="CopyDocument" name="复制" @click="copy(item.answer)"></el-button>
-                  <el-button :icon="Refresh" name="再来一次" @click="Reanswer(index, topicList[0])"></el-button>
+                  <el-button
+                    :icon="CopyDocument"
+                    name="复制"
+                    @click="copy(item.answer)"
+                  ></el-button>
+                  <el-button
+                    :icon="Refresh"
+                    name="再来一次"
+                    @click="Reanswer(index, topicList[0])"
+                  ></el-button>
                 </div>
               </div>
             </div>
@@ -52,7 +65,6 @@
         </div>
         <div class="tempBubble" v-if="isUpload">
           <div class="userBubble">
-
             <div class="userText">
               <div class="userImg Image">
                 <img src="../assets/MdiAccount.svg" alt="" />
@@ -62,7 +74,6 @@
           </div>
 
           <div class="agentBubble">
-
             <div class="agentText">
               <div class="agentImg Image">
                 <img src="../assets/MdiLinux.svg" alt="" />
@@ -86,34 +97,53 @@
         ↓
       </el-buttton>
 
-
       <div class="BGfuzzyTop"></div>
       <div class="BGfuzzy"></div>
       <!-- 输入框部分 -->
       <div class="chatInput">
         <div class="inputTop">
-          <el-button :class="[{ otherBtn: true, recording: microphoneStatus }]" :icon="Microphone"
-            @click="adiuoRecognition" />
+          <el-button
+            :class="[{ otherBtn: true, recording: microphoneStatus }]"
+            :icon="Microphone"
+            @click="adiuoRecognition"
+          />
           <el-button class="otherBtn" :icon="Picture" @click="blurToBG" />
         </div>
         <div class="textInput">
-          <textarea name="" id="" cols="" rows="5" placeholder="请输入您要提问的问题" v-model="usersInput"
-            @keydown.enter="postUsersText" class="userInput" style="width: 100%"></textarea>
+          <textarea
+            name=""
+            id=""
+            cols=""
+            rows="5"
+            placeholder="请输入您要提问的问题"
+            v-model="usersInput"
+            @keydown.enter="postUsersText"
+            class="userInput"
+            style="width: 100%"
+          ></textarea>
         </div>
         <div class="inputBottom">
-          <el-button :icon="Search" @click="loadingNewDialog" class="SearchBtn" :loading="isUpload" />
+          <el-button
+            :icon="Search"
+            @click="loadingNewDialog"
+            class="SearchBtn"
+            :loading="isUpload"
+          />
         </div>
       </div>
-      <div class="bottomFlat">{{ webVersion }}</div>
+      <div class="bottomFlat">
+        {{ webVersion }}
+        <div v-html="markdown"></div>
+      </div>
     </el-col>
   </div>
 </template>
 
 <script setup>
-
 // 导入axios库
 import axios from "axios";
-
+// 导入marked库，可以将markdown格式的字符串转为markdown样式
+import { marked } from "marked";
 // 导入element-plus库的内置图标
 import {
   Search,
@@ -123,7 +153,7 @@ import {
   CopyDocument,
   Refresh,
   ArrowDownBold,
-  ArrowUpBold
+  ArrowUpBold,
 } from "@element-plus/icons-vue";
 
 // 导入vue3自带的函数
@@ -145,9 +175,17 @@ const route = useRoute();
 import { storeToRefs } from "pinia";
 import useShop from "../store/index.js";
 const store = useShop();
-const { isbgBlur, chatId, isUpload, isReUpload, historyList, webVersion, uname, email, phone } =
-  storeToRefs(store);
-
+const {
+  isbgBlur,
+  chatId,
+  isUpload,
+  isReUpload,
+  historyList,
+  webVersion,
+  uname,
+  email,
+  phone,
+} = storeToRefs(store);
 
 //导入@vueuse/core库以及相关函数
 import { useClipboard } from "@vueuse/core";
@@ -157,40 +195,36 @@ const { text, isSupported, copy } = useClipboard();
 /**
  * 下面是初始化本页面需要的响应式数据
  */
-const usersInput = ref("");  // usersInput是用户输入框的双向绑定字符串数据，与发送问题系统相关
-const microphoneStatus = ref(false);  // microphoneStatus是麦克风是否开启的状态数据，与音转文系统相关
-const isGotoTop = ref(false)          // isGotoTop是判断用户想要去 顶部 还是 底部 的状态数据，与移动系统相关
-const topicIndex = ref(0);   // topicIndex是用于回去当前topicList在historyList的索引，与切换对话系统相关
-const topicList = reactive([]);  // topicList是用于存储当前对话的List，与切换对话系统、数据加载系统等相关
-const tempQuestion = ref("");  // 临时的question存放变量
+const usersInput = ref(""); // usersInput是用户输入框的双向绑定字符串数据，与发送问题系统相关
+const microphoneStatus = ref(false); // microphoneStatus是麦克风是否开启的状态数据，与音转文系统相关
+const isGotoTop = ref(false); // isGotoTop是判断用户想要去 顶部 还是 底部 的状态数据，与移动系统相关
+const topicIndex = ref(0); // topicIndex是用于回去当前topicList在historyList的索引，与切换对话系统相关
+const topicList = reactive([]); // topicList是用于存储当前对话的List，与切换对话系统、数据加载系统等相关
+const tempQuestion = ref(""); // 临时的question存放变量
 const tempAnswer = ref("正在为您生成答案中.");
-
-
 /**
  * 下面是初始化本页面需要的常量或变量
  */
 // 后端地址，前端向大模型提问的接口地址，与发送问题系统相关
-const AGENT_URL = "http://10.8.7.12:86/chat";
+const AGENT_URL = "http://10.8.7.12:86";
 // 让对话保持在底部的计时器，与发送问题系统相关
 let chatWindowScroll = null;
-
-
 
 // 获取历史数据列表
 
 /**
  * 前端
- * 
+ *
  * 数据加载系统
- * 
+ *
  * @param uid 用户id，用于让后端定位用户信息
- * 
+ *
  * 功能：
  *      1、获取历史数据列表，用于显示当前对话的历史记录，以及同步用户信息
  *      2、同时会给新建用户创建第一个对话
- *      
+ *
  * 注意：与chatHistoryWindow.vue的getHistoryList功能类似，但是比它的复杂
- * 
+ *
  */
 const getHistoryList = (uid) => {
   axios
@@ -201,11 +235,11 @@ const getHistoryList = (uid) => {
     .then((res) => {
       if (res.status === 200) {
         // 将退出登录前的最后一次对话同步到chatId
-        chatId.value = res.data.lastChat
+        chatId.value = res.data.lastChat;
         // 同步用户信息
-        uname.value = res.data.uname
-        email.value = res.data.email
-        phone.value = res.data.phone
+        uname.value = res.data.uname;
+        email.value = res.data.email;
+        phone.value = res.data.phone;
         // console.log(chatId.value);
         // 获取历史列表
         if (res.data.historyList.length !== 0) {
@@ -215,35 +249,47 @@ const getHistoryList = (uid) => {
           // console.log(historyList.value);
           /**
            * 前端
-           * 
+           *
            * 切换对话系统
-           * 
+           *
            * 功能：
            *      1、这里判断topicList必须为空才能将响应的history追加到topicList中
            *         否则容易在路由切换时重复的追加history导致历史记录切换失败
            */
           if (topicList.length == 0) {
             topicList.push(historyList.value[topicIndex.value].history);
+            topicList[0].forEach((element) => {
+              element.answer = marked(element.answer);
+            });
           }
           // console.log(topicList);
-        }
-        /**
-         * 前端
-         * 
-         * 注册系统
-         * 
-         * 功能：
-         *     当检测到账号没有历史对话会创建第一个对话
-         */
-        else {
+        } else {
+          /**
+           * 前端
+           *
+           * 注册系统
+           *
+           * 功能：
+           *     当检测到账号没有历史对话会创建第一个对话
+           */
           historyList.value[0] = {
             topicId: "0",
             topic: "新对话",
             history: [],
           };
           topicList.push(historyList.value[topicIndex.value].history);
+          topicList[0].forEach((element) => {
+            element.answer = marked(element.answer);
+          });
           const routeParams = route.params;
-          store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
+          store.postDataTOServer(
+            routeParams.uid.split(":")[1],
+            chatId.value,
+            uname.value,
+            email.value,
+            phone.value,
+            historyList.value
+          );
         }
       }
     });
@@ -274,28 +320,50 @@ const postUsersText = (tempAnswerInterval) => {
   let chatWindow = document.querySelector(".chatWindow");
 
   chatWindowScroll = setInterval(() => {
-    chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
+    // chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
+    chatWindow.scrollTo({
+      top: chatWindow.scrollHeight - chatWindow.clientHeight,
+      behavior: "smooth",
+    });
   }, 100);
   axios
     .post(AGENT_URL, { user_input: usersInput.value })
     .then((response) => {
       dialog.answer = response.data.response;
+      dialog.answer = marked(dialog.answer);
       topicList[0].push(dialog);
+      historyList.value[topicIndex.value].history.push(dialog);
       isUpload.value = false;
       clearInterval(tempAnswerInterval);
       tempAnswer.value = "正在为您生成答案中.";
       const routeParams = route.params;
-      store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
+      store.postDataTOServer(
+        routeParams.uid.split(":")[1],
+        chatId.value,
+        uname.value,
+        email.value,
+        phone.value,
+        historyList.value
+      );
     })
     .catch((error) => {
-      dialog.answer = "抱歉，网络发生错误，无法获取回答";
+      dialog.answer = "#### 抱歉，网络发生错误，无法获取回答";
+      dialog.answer = marked(dialog.answer);
       topicList[0].push(dialog);
+      historyList.value[topicIndex.value].history.push(dialog);
       console.error("Error sending user input:", error);
       isUpload.value = false;
       clearInterval(tempAnswerInterval);
       tempAnswer.value = "正在为您生成答案中.";
       const routeParams = route.params;
-      store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
+      store.postDataTOServer(
+        routeParams.uid.split(":")[1],
+        chatId.value,
+        uname.value,
+        email.value,
+        phone.value,
+        historyList.value
+      );
     });
 
   usersInput.value = "";
@@ -334,29 +402,33 @@ const Reanswer = (index, dialogList) => {
     .catch((error) => {
       clearInterval(tempAnswerInterval);
       isReUpload.value = !isReUpload.value;
-      dialogList[index].answer = "抱歉，网络发生错误，无法获取回答";
+      dialogList[index].answer = "#### 抱歉，网络发生错误，无法获取回答";
+      dialogList[index].answer = marked(dialogList[index].answer);
       console.error("Error sending user input:", error);
       // const routeParams = route.params;
       // store.postDataTOServer(routeParams.uid.split(":")[1], chatId.value, uname.value, email.value, phone.value, historyList.value)
     });
 };
 
-
 // 滚动到最上或者最下
 const goto = (where) => {
   let chatWindow = document.querySelector(".chatWindow");
   switch (where) {
     case "top":
-      chatWindow.scrollTop = 0
+      // chatWindow.scrollTop = 0;
+      chatWindow.scrollTo({ top: 0, behavior: "smooth" });
       break;
     case "bottom":
-      chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
+      // chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
+      chatWindow.scrollTo({
+        top: chatWindow.scrollHeight - chatWindow.clientHeight,
+        behavior: "smooth",
+      });
       break;
     default:
       break;
   }
-}
-
+};
 
 // 停止窗口自动向下的计时器
 const stopChatWindowAutoDown = (chatWindowScroll) => {
@@ -364,14 +436,13 @@ const stopChatWindowAutoDown = (chatWindowScroll) => {
     return;
   }
   clearInterval(chatWindowScroll);
-}
+};
 
 // 滚动鼠标滚轮停止窗口自动向下
 window.onwheel = function (ev) {
-  stopChatWindowAutoDown(chatWindowScroll)
+  stopChatWindowAutoDown(chatWindowScroll);
   // console.log(ev);
 };
-
 
 // 语音识别
 let recognition;
@@ -444,9 +515,14 @@ onBeforeMount(() => {
 // 页面渲染之后的回调函数
 onMounted(() => {
   let chatWindow = document.querySelector(".chatWindow");
-  let chatWindowNow = 0
+  let chatWindowNow = 0;
+
   setTimeout(() => {
-    chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
+    // chatWindow.scrollTop = chatWindow.scrollHeight - chatWindow.clientHeight;
+    chatWindow.scrollTo({
+      top: chatWindow.scrollHeight - chatWindow.clientHeight,
+      behavior: "smooth",
+    });
   }, 1000);
   // 滚动滚动条停止窗口自动向下
   chatWindow.addEventListener("scroll", () => {
@@ -456,19 +532,18 @@ onMounted(() => {
     clearInterval(chatWindowScroll);
   });
 
-
   /**
    * 前端
-   * 
+   *
    * 切换对话系统
-   * 
+   *
    * 功能：
    *      1、使用vue项目自带的watch，监测piaio中的chatId
    *      2、当chatId发生改变后，通过修改topicList从而实现对话修改
-   * 
+   *
    * 注意：
    *      1、topicList的数据结构是:[[{question:...,answer:...},{question:...,answer:...},......]]
-   * 
+   *
    * 更多在chatHistoryWindow.vue查找:切换对话系统
    */
   watch(
@@ -480,29 +555,28 @@ onMounted(() => {
           chatWindow.scrollHeight - chatWindow.clientHeight;
       }, 100);
       historyList.value.find((value, index, obj) => {
-
         if (value.topicId == chatId.value) {
           topicIndex.value = index;
           topicList.shift();
           topicList.push(historyList.value[topicIndex.value].history);
-
         }
       });
     },
     { deep: true, immediate: true }
   );
+
   setInterval(() => {
-    chatWindowNow = chatWindow.scrollTop
-  }, 100)
+    chatWindowNow = chatWindow.scrollTop;
+  }, 100);
+
   // 判断页面上滑还是下滑，以修改goto按钮的向下或向上
   chatWindow.onscroll = function (ev) {
     if (chatWindow.scrollTop >= chatWindowNow) {
-      isGotoTop.value = false
+      isGotoTop.value = false;
     } else {
-      isGotoTop.value = true
+      isGotoTop.value = true;
     }
-  }
-
+  };
 });
 
 onBeforeUpdate(() => {
@@ -766,7 +840,6 @@ onBeforeUpdate(() => {
   display: flex;
   justify-content: start;
   align-items: center;
-
 }
 
 .agentTextBottom .el-button {
@@ -797,7 +870,6 @@ onBeforeUpdate(() => {
   /* align-items: center; */
   flex-direction: column;
   position: relative;
-
 }
 
 .userBubble {
@@ -838,7 +910,6 @@ onBeforeUpdate(() => {
   height: 50px;
   right: 100%;
   position: absolute;
-
 }
 
 .agentImg img {
