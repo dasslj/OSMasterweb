@@ -1,5 +1,6 @@
 let express = require("express")
 let multiparty = require('multiparty');
+const multer = require("multer")
 let router = express.Router()
 const fs = require("fs")
 
@@ -19,6 +20,22 @@ const readJsonData = () => {
     userInfoList = jsonObj.userInfoList
 }
 readJsonData()
+
+// 设置存储配置
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'router/image') // 确保这个文件夹已经存在
+    },
+    filename: function (req, file, cb) {
+        let ext = file.originalname.substring(file.originalname.lastIndexOf('.'));
+        cb(null, file.fieldname + '-' + Date.now() + ext) // 自定义文件名
+        console.log();
+    }
+})
+
+const upload = multer({ dest: "router/image", storage: storage })
+
+
 
 
 // 问题接收及回答发送模拟
@@ -48,22 +65,23 @@ router.post('/chat', (req, res) => {
     })
     // 这里要获取回答
 
-    answer = "sdsadjaslkj apodasjdoasjdj asdoas;ldkldksdsadjaslkj apodasjdoasjdj asdoas;ldkldksdsadjaslkj apodasjdoasjdj asdoas;ldkldksdsadjaslkj apodasjdoasjdj asdoas;ldkldksdsadjaslkj apodasjdoasjdj asdoas;ldkldksdsadjaslkj apodasjdoasjdj asdoas;ldkldksdsadjaslkj apodasjdoasjdj asdoas;ldkldksdsadjaslkj apodasjdoasjdj asdoas;ldkldksdsadjaslkj apodasjdoasjdj asdoas;ldkldk"
+    answer = "# sdsadjaslkj \n - apodasjdoasjdj \n - asdoas;ldkldksdsadjaslkj \n - apodasjdoasjdj \n - asdoas;ldkldksdsadjaslkj"
 })
 
 // 音频接收及发送模拟
 
-router.post("/audio", (req, res) => {
-    // formData = req.body
-    let form = new multiparty.Form()
-    form.parse(req, function (err, fields, file) {
-        console.log(fields);
-        res.send({
-            status: 0,			//状态，0表示成功，1表示失败
-            msg: 'POST请求成功(audio)', //状态描述
-            data: fields		  // 需要响应给客户端的具体数据
-        })
+router.post("/audio", upload.single("image"), (req, res) => {
 
+    const file = req.file
+
+
+    if (!file) {
+        return res.status(400).send("上传失败")
+    }
+    // console.log(req.);
+    res.send({
+        status: 1,
+        msg: "上传成功"
     })
 
 })

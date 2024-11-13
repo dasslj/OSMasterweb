@@ -3,9 +3,7 @@
     <!-- <div class="chatWindowTitle"></div> -->
     <el-col>
       <div class="chatWindow">
-        <div
-          class="BGfuzzyTop"
-          style="
+        <div class="BGfuzzyTop" style="
             top: 0%;
             background: linear-gradient(
               180deg,
@@ -14,8 +12,7 @@
             );
             left: 50%;
             transform: translateX(-50%);
-          "
-        ></div>
+          "></div>
         <div class="placehoderBox"></div>
         <div class="agentBubble" id="firstAgentBubble">
           <div class="agentText">
@@ -48,16 +45,8 @@
                   <div v-html="item.answer"></div>
                 </div>
                 <div class="agentTextBottom">
-                  <el-button
-                    :icon="CopyDocument"
-                    name="复制"
-                    @click="copy(item.answer)"
-                  ></el-button>
-                  <el-button
-                    :icon="Refresh"
-                    name="再来一次"
-                    @click="Reanswer(index, topicList[0])"
-                  ></el-button>
+                  <el-button :icon="CopyDocument" name="复制" @click="copy(item.answer)"></el-button>
+                  <el-button :icon="Refresh" name="再来一次" @click="Reanswer(index, topicList[0])"></el-button>
                 </div>
               </div>
             </div>
@@ -102,38 +91,20 @@
       <!-- 输入框部分 -->
       <div class="chatInput">
         <div class="inputTop">
-          <el-button
-            :class="[{ otherBtn: true, recording: microphoneStatus }]"
-            :icon="Microphone"
-            @click="adiuoRecognition"
-          />
+          <el-button :class="[{ otherBtn: true, recording: microphoneStatus }]" :icon="Microphone"
+            @click="adiuoRecognition" />
           <el-button class="otherBtn" :icon="Picture" @click="blurToBG" />
         </div>
         <div class="textInput">
-          <textarea
-            name=""
-            id=""
-            cols=""
-            rows="5"
-            placeholder="请输入您要提问的问题"
-            v-model="usersInput"
-            @keydown.enter="postUsersText"
-            class="userInput"
-            style="width: 100%"
-          ></textarea>
+          <textarea name="" id="" cols="" rows="5" placeholder="请输入您要提问的问题" v-model="usersInput"
+            @keydown.enter="postUsersText" class="userInput" style="width: 100%"></textarea>
         </div>
         <div class="inputBottom">
-          <el-button
-            :icon="Search"
-            @click="loadingNewDialog"
-            class="SearchBtn"
-            :loading="isUpload"
-          />
+          <el-button :icon="Search" @click="loadingNewDialog" class="SearchBtn" :loading="isUpload" />
         </div>
       </div>
       <div class="bottomFlat">
         {{ webVersion }}
-        <div v-html="markdown"></div>
       </div>
     </el-col>
   </div>

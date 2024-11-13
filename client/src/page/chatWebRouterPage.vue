@@ -66,9 +66,10 @@
           <Close />
         </el-icon></a>
 
-      <div class="uploadWindow">
+      <!-- <div class="uploadWindow">
         <el-upload ref="uploadRef" class="upload-demo uploadArea" drag multiple action="http://127.0.0.1:8888/one/audio"
-          accept="image" list-type="text" limit="5" :on-success="imgSuccessUpload" :on-exceed="imgExceedUpload">
+          accept="image" list-type="text" limit="5" :on-success="imgSuccessUpload" :on-exceed="imgExceedUpload"
+          :headers="getHeaders">
           <el-icon class="el-icon--upload"><upload-filled /></el-icon>
           <div class="el-upload__text">
             <div>将文件拖拽至此区域</div>
@@ -78,7 +79,12 @@
             <div class="el-upload__tip">最多同时上传5张图片</div>
           </template>
         </el-upload>
-      </div>
+      </div> -->
+      <form id="imageForm" enctype="multipart/form-data">
+        <input type="file" id="imageInput" name="image">
+        <button type="submit" @click="uploadImage">上传</button>
+      </form>
+
     </div>
   </div>
 </template>
@@ -141,6 +147,31 @@ const imgExceedUpload = (response, uploadFiles) => {
   alert("最多同时上传五张照片");
 };
 
+// 设置请求头
+const getHeaders = () => {
+  return {
+    'Content-Type': 'multipart/form-data'
+  }
+}
+
+// 上传图片
+const uploadImage = () => {
+  const imageInput = document.querySelector("#imageInput")
+  const formData = new FormData()
+
+  formData.append("image", imageInput.files[0])
+  formData.append("uid", '' + uid)
+  axios.post("http://127.0.0.1:8888/one/audio", formData)
+    .then(res => {
+      console.log("上传成功");
+      console.log(res);
+    })
+    .catch(e => {
+      console.log("上传失败");
+    })
+}
+
+
 /**
  * 前端
  * 
@@ -178,16 +209,21 @@ const Logout = (uid) => {
 };
 
 
+
+
 // 页面渲染之前的钩子函数
-onBeforeMount(() => { });
+onBeforeMount(() => {
+
+});
 // 页面渲染之后的钩子函数
 onMounted(() => {
+
 });
 </script>
 
 <style scoped>
 .leftRouter {
-  border-right: #c0c0c0 3px solid;
+  border-right: #fff 3px solid;
   z-index: 1000;
   background-color: #2c2c2c;
   transition: 0.5s;
