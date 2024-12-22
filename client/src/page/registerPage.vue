@@ -13,9 +13,17 @@
           </div> -->
                 <p>请使用手机号或者邮箱登录</p>
                 <div class="inputList">
-                  <input placeholder="手机号/邮箱" v-model="registerForm.account" @keydown.enter="userRegister" />
-                  <input placeholder="密码" type="password" v-model="registerForm.password"
-                    @keydown.enter="userRegister" />
+                  <input
+                    placeholder="手机号/邮箱"
+                    v-model="registerForm.account"
+                    @keydown.enter="userRegister"
+                  />
+                  <input
+                    placeholder="密码"
+                    type="password"
+                    v-model="registerForm.password"
+                    @keydown.enter="userRegister"
+                  />
                 </div>
                 <el-button @click="userRegister">登 录</el-button>
               </div>
@@ -51,11 +59,28 @@
           </div> -->
               <p>请使用手机号或者邮箱登录</p>
               <div class="inputList">
-                <input placeholder="用户名" v-model="loginForm.uname" @keydown.enter="userLogin" />
-                <input placeholder="手机号/邮箱" v-model="emailOrPhone" @keydown.enter="userLogin" />
-                <input placeholder="密码" type="password" v-model="loginForm.password" @keydown.enter="userLogin" />
-                <input placeholder="确认密码" type="password" v-model="loginForm.passwordAgain"
-                  @keydown.enter="userLogin" />
+                <input
+                  placeholder="用户名"
+                  v-model="loginForm.uname"
+                  @keydown.enter="userLogin"
+                />
+                <input
+                  placeholder="手机号/邮箱"
+                  v-model="emailOrPhone"
+                  @keydown.enter="userLogin"
+                />
+                <input
+                  placeholder="密码"
+                  type="password"
+                  v-model="loginForm.password"
+                  @keydown.enter="userLogin"
+                />
+                <input
+                  placeholder="确认密码"
+                  type="password"
+                  v-model="loginForm.passwordAgain"
+                  @keydown.enter="userLogin"
+                />
               </div>
               <el-button @click="userLogin">注 册</el-button>
             </div>
@@ -187,6 +212,8 @@ const userLogin = () => {
       })
       .then((res) => {
         if (res.status) {
+          console.log(res.data.loginStatus);
+
           if (res.data.loginStatus) {
             alert("注册成功，回去登录吧");
             loginForm.uname = "";
@@ -210,7 +237,7 @@ const userLogin = () => {
   }
 };
 
-onMounted(() => { });
+onMounted(() => {});
 </script>
 
 <style scoped>

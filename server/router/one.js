@@ -243,11 +243,23 @@ router.post("/register", (req, res) => {
  */
 router.post("/login", (req, res) => {
     const loginInfo = req.body
+    console.log(loginInfo);
+
     let isLogined = false
     userInfoList.find((item) => {
-        if (item.email == loginInfo.email || item.phone == loginInfo.phone) {
+
+        // if (item.email == loginInfo.email || item.phone == loginInfo.phone) {
+        //     isLogined = true
+        // }
+
+        if (item.email == loginInfo.email && item.email !== "") {
             isLogined = true
         }
+
+        if (item.phone == loginInfo.phone && item.phone !== "") {
+            isLogined = true
+        }
+
     })
 
     if (isLogined) {
